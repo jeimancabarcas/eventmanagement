@@ -121,9 +121,16 @@ export const deleteEvent = async (id: string): Promise<boolean> => {
 
 export const deleteManyEvents = async (ids: string[]): Promise<boolean> => {
   try {
-    for (const id of ids) {
-      await db.collection('events').doc(id).delete();
-    }
+    const batch = db.batch();
+
+    try {
+      ids.forEach(id => {
+        const eventRef = db.collection('events').doc(id);
+        batch.delete(eventRef);
+      });
+  
+    await batch.commit(); // Ejecuta la eliminación en batch
+    
     return true;
   } catch (error) {
     throw (error)
