@@ -12,13 +12,13 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 
+app.use(cors());
+
 app.use(UserRoutes);
 app.use(EventRoutes);
 app.use(EventLogisticsRoutes);
 app.use(MasterStaffRoutes);
 app.use(RoleRoutes);
-app.use(cors());
-
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);
 });
