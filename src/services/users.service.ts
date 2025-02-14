@@ -6,6 +6,7 @@ import CryptoJs from "crypto-js";
 import * as jwt from 'jsonwebtoken';
 import "dotenv/config";
 import { UserDto } from "src/model/dto/user.dto";
+const admin = require("firebase-admin");
 
 export const getAllUsers = async (): Promise<UserDoc[]> => {
   const usersRef = db
@@ -23,21 +24,32 @@ export const getAllUsers = async (): Promise<UserDoc[]> => {
 }
 
 export const createUser = async (user: UserDoc): Promise<UserDto | undefined> => {
-  if (process.env.SECRET_KEY) {
-    user = {
-      ...user,
-      password: CryptoJs.AES.encrypt(user.password, process.env.SECRET_KEY).toString()
-    }
-    const userRef = db.
-      collection('users')
-      .withConverter({
-        toFirestore: userDtoToFirestore,
-        fromFirestore: userDtoFromFirestore
-      });
-    const userId = await userRef.add(user);
-    const snapshop = await userRef.doc(userId.id).get();
-    const newUser = snapshop.data();
-    return newUser;
+  try {
+    const userRecord = await admin.auth().createUser({
+      email: user.email,
+      password: user.password,
+      displayName: user.name,
+    });
+    await admin.auth().setCustomUserClaims(userRecord.uid, { role: user.role });
+    const userRef = db.collection("users").doc(userRecord.uid);
+    const userData: UserDto= {
+      name: user.name,
+      lastName: user.lastName,
+      email: user.email,
+      role: user.role,
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    };
+
+    await userRef.set(userData);
+    const snapshot = await userRef.get();
+
+    return {
+      id: snapshot.id,
+      ...snapshot.data()
+    };
+  } catch (error) {
+    console.error("Error creando usuario:", error);
+    return undefined;
   }
 }
 

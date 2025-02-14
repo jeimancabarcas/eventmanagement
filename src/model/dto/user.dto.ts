@@ -1,7 +1,9 @@
 export interface UserDto {
-  name: string,
-  email: string,
-  password: string,
-  lastName: string,
-  rol: string
+  id?: string,
+  name?: string,
+  email?: string,
+  password?: string,
+  lastName?: string,
+  role?: string,
+  createdAt?: Date
 }

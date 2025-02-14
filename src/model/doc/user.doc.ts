@@ -1,11 +1,11 @@
 import { firestore } from "firebase-admin";
 export interface UserDoc {
-  id: string
+  id?: string
   name: string,
   email: string,
   password: string,
   lastName: string,
-  rol: string
+  role: string
 }
 
 export function userDtoToFirestore(userDto: UserDoc): firestore.DocumentData {
@@ -14,7 +14,7 @@ export function userDtoToFirestore(userDto: UserDoc): firestore.DocumentData {
     email: userDto.email,
     password: userDto.password,
     lastName: userDto.lastName,
-    rol: userDto.rol
+    role: userDto.role
   }
 }
 
@@ -26,6 +26,6 @@ export function userDtoFromFirestore(snapshot: firestore.QueryDocumentSnapshot):
     email: data.email,
     password: data.password,
     lastName: data.lastName,
-    rol: data.rol
+    role: data.role
   }
 }
