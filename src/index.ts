@@ -1,6 +1,5 @@
 import express from "express";
 import { UserRoutes } from "./routes/users.routes";
-import "dotenv/config";
 import { EventRoutes } from "./routes/event.routes";
 import { EventLogisticsRoutes } from "./routes/staff.routes";
 import { RoleRoutes } from "./routes/role.routes";
