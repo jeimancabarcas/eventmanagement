@@ -62,6 +62,6 @@ export const DeleteEvent = async (req: Request, res: Response) => {
     const userDelete = await deleteEvent(id);
     res.status(200).send(userDelete);
   } catch (error) {
-
+    res.status(500);
   }
 }

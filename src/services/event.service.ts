@@ -110,7 +110,11 @@ export const updateEvent = async (id: string, eventUpdate: EventDto): Promise<Ev
   return updatedEventDoc;
 }
 
-export const deleteEvent = async (id: string): Promise<string> => {
-  const eventRef = await db.collection('events').doc(id).delete();
-  return ' Event deleted';
+export const deleteEvent = async (id: string): Promise<boolean> => {
+  try {
+    const eventRef = await db.collection('events').doc(id).delete();
+    return true;
+  } catch (error) {
+    throw (error)
+  }
 }
