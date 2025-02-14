@@ -65,18 +65,35 @@ export const getById = async (id: string): Promise<UserDto | undefined> => {
   return user;
 }
 
-export const updateUser = async (id: string, updateUser: UserDto): Promise<UserDto | undefined> => {
-  const userRef = db
-    .collection('users')
-    .withConverter({
-      toFirestore: userDtoToFirestore,
-      fromFirestore: userDtoFromFirestore
+export const updateUser = async (updateUser: UserDto): Promise<UserDto | undefined> => {
+  try {
+    const userRef = db.collection("users").doc(updateUser.id as string);
+    const snapshot = await userRef.get();
+    if (!snapshot.exists) {
+      throw new Error(`Usuario con ID ${updateUser.id as string} no encontrado.`);
+    }
+    const userData: UserDto= {
+      name: updateUser.name,
+      lastName: updateUser.lastName,
+      email: updateUser.email,
+      role: updateUser.role,
+    };
+    await userRef.update({
+      ...userData,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp()
     });
-  await userRef.doc(id).update({
-    ...updateUser
-  });
-  const snapshop = await userRef.doc(id).get();
-  return snapshop.data();
+    await admin.auth().updateUser(updateUser.id, {
+      email: updateUser.email,
+      password: updateUser.password,
+      displayName: updateUser.name,
+    });
+
+    const updatedSnapshot = await userRef.get();
+    return updatedSnapshot.data() as UserDto;
+  } catch (error) {
+    console.error("Error al actualizar usuario:", error);
+    return undefined;
+  }
 }
 
 export const deleteUser = async (id: string): Promise<string> => {

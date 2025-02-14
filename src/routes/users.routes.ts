@@ -25,5 +25,5 @@ UserRoutes.get("/roles", async (req: Request, res: Response) => {
 UserRoutes.get(`${prefix}/getall`, GetAllUsers);
 UserRoutes.post(`${prefix}/create`, CreateUser);
 UserRoutes.get(`${prefix}/get/:id`, GetById);
-UserRoutes.put(`${prefix}/update/:id`, UpdateUser);
+UserRoutes.put(`${prefix}/update`, UpdateUser);
 UserRoutes.delete(`${prefix}/delete/:id`, DeleteUser);

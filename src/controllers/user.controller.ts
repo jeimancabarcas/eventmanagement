@@ -44,14 +44,7 @@ export const CreateUser = async (req: Request, res: Response) => {
 export const UpdateUser = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
-    let user = req.body.data;
-    if (process.env.SECRET_KEY && user.password) {
-      user = {
-        ...user,
-        password: CryptoJS.AES.encrypt(user.password, process.env.SECRET_KEY).toString()
-      };
-    }
-    const userUpdate = await updateUser(id, user);
+    const userUpdate = await updateUser(req.body);
     res.status(200).json({
       "Message": "Updated user suscessfull",
       "User": userUpdate
