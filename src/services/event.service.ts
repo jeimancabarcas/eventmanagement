@@ -121,9 +121,9 @@ export const deleteEvent = async (id: string): Promise<boolean> => {
 
 export const deleteManyEvents = async (ids: string[]): Promise<boolean> => {
   try {
-    ids.forEach(async (id) => {
-      const eventRef = await db.collection('events').doc(id).delete();
-    })
+    for (const id of ids) {
+      await db.collection('events').doc(id).delete();
+    }
     return true;
   } catch (error) {
     throw (error)
