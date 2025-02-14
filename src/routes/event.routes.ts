@@ -1,5 +1,5 @@
 import express, { Request, Response } from 'express';
-import { CreateEvent, GetAllEvents, UpdateEvent, DeleteEvent, GetByIdEvent } from '../controllers/event.controller';
+import { CreateEvent, GetAllEvents, UpdateEvent, DeleteEvent, GetByIdEvent, DeleteManyEvents } from '../controllers/event.controller';
 import { updateEvent } from 'src/services/event.service';
 
 export const EventRoutes = express.Router();
@@ -10,4 +10,5 @@ EventRoutes.get(`${prefix}/getall`, GetAllEvents);
 EventRoutes.put(`${prefix}/update/:id`, UpdateEvent);
 EventRoutes.get(`${prefix}/getById/:id`, GetByIdEvent);
 EventRoutes.delete(`${prefix}/delete/:id`, DeleteEvent);
+EventRoutes.delete(`${prefix}/delete/many`, DeleteManyEvents);
 

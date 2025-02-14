@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { createEvent, getAllEvents, getByIdEvent, updateEvent, deleteEvent } from "../services/event.service";
+import { createEvent, getAllEvents, getByIdEvent, updateEvent, deleteEvent, deleteManyEvents } from "../services/event.service";
 import { EventDto } from "../model/dto/event.dto";
 
 export const CreateEvent = async (req: Request, res: Response) => {
@@ -58,6 +58,16 @@ export const DeleteEvent = async (req: Request, res: Response) => {
   try {
     const userDelete = await deleteEvent(id);
     res.status(200).send(userDelete);
+  } catch (error) {
+    res.status(500);
+  }
+}
+
+export const DeleteManyEvents = async (req: Request, res: Response) => {
+  const { ids } = req.body;
+  try {
+    const response = await deleteManyEvents(ids);
+    res.status(200).send(response);
   } catch (error) {
     res.status(500);
   }
