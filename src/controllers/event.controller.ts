@@ -3,10 +3,7 @@ import { createEvent, getAllEvents, getByIdEvent, updateEvent, deleteEvent } fro
 import { EventDto } from "../model/dto/event.dto";
 
 export const CreateEvent = async (req: Request, res: Response) => {
-  const { start_date, end_date } = req.body;
   const eventDto: EventDto = {
-    start_date: start_date ? start_date : null,
-    end_date: end_date ? end_date : null,
     ...req.body
   };
 
