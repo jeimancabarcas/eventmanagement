@@ -2,17 +2,14 @@ import * as admin from "firebase-admin";
 import { getFirestore } from "firebase-admin/firestore";
 import "dotenv/config";
 
-if (!process.env.FIREBASE_PRIVATE_KEY) {
-  throw new Error('FIREBASE_PRIVATE_KEY is not defined in the environment variables.');
-}
-
-console.log(process.env.FIREBASE_PRIVATE_KEY)
+const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/^"|"$/g, '');
 const serviceAccount = {
   projectId: process.env.FIREBASE_PROJECT_ID,
   clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-  privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/^"|"$/g, ''),
+  privateKey
 };
-console.log(serviceAccount.privateKey)
+console.log("Original", process.env.FIREBASE_PRIVATE_KEY)
+console.log("Formatted", privateKey)
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
