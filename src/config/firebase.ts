@@ -2,14 +2,13 @@ import * as admin from "firebase-admin";
 import { getFirestore } from "firebase-admin/firestore";
 import "dotenv/config";
 
-const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/^"|"$/g, '');
+console.log(process.env.FIREBASE_PRIVATE_KEY)
 const serviceAccount = {
   projectId: process.env.FIREBASE_PROJECT_ID,
   clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-  privateKey
+  privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
 };
-console.log("Original", process.env.FIREBASE_PRIVATE_KEY)
-console.log("Formatted", privateKey)
+console.log(serviceAccount.privateKey)
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
