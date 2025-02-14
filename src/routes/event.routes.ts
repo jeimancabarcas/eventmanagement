@@ -10,5 +10,5 @@ EventRoutes.get(`${prefix}/getall`, GetAllEvents);
 EventRoutes.put(`${prefix}/update/:id`, UpdateEvent);
 EventRoutes.get(`${prefix}/getById/:id`, GetByIdEvent);
 EventRoutes.delete(`${prefix}/delete/:id`, DeleteEvent);
-EventRoutes.delete(`${prefix}/delete/many`, DeleteManyEvents);
+EventRoutes.delete(`${prefix}/deleteMany`, DeleteManyEvents);
 
