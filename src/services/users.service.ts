@@ -78,17 +78,35 @@ export const updateUser = async (id: string, updateUser: UserDto): Promise<UserD
   const snapshop = await userRef.doc(id).get();
   return snapshop.data();
 }
-export const deleteUser = async (id: string): Promise<string> => {
-  const userRef = db
-    .collection('users')
-    .withConverter({
-      toFirestore: userDtoToFirestore,
-      fromFirestore: userDtoFromFirestore
-    });
-  await userRef.doc(id).delete();
-  return 'deleted user';
-}
 
+export const deleteUser = async (id: string): Promise<string> => {
+  try {
+    const userRef = admin.firestore().collection("users").doc(id);
+    const snapshot = await userRef.get();
+
+    if (!snapshot.exists) {
+      return `Usuario con ID ${id} no encontrado en Firestore.`;
+    }
+
+    try {
+      await admin.auth().getUser(id);
+    } catch (error: any) {
+      if (error.code === "auth/user-not-found") {
+        return `Usuario con ID ${id} no encontrado en Firebase Authentication.`;
+      }
+      throw error; 
+    }
+
+
+    await userRef.delete(); 
+    await admin.auth().deleteUser(id); 
+
+    return `Usuario con ID ${id} eliminado correctamente.`;
+  } catch (error) {
+    console.error("Error al eliminar usuario:", error);
+    return "Error al eliminar el usuario. Inténtalo nuevamente.";
+  }
+};
 
 export const authUser = async (dtoToken: DtoToken) => {
   const userTofind = await db.collection('users').where("name", "==", dtoToken.name).limit(1).get();
