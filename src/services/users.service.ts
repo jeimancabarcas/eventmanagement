@@ -11,23 +11,18 @@ export const getAllUsers = async (): Promise<UserDto[]> => {
   const usersSnapshot = await db
     .collection('users').get();
   const users = new Array<UserDto>();
-  usersSnapshot.forEach((user) => {
-    const userDto: UserDto = {
-      id: user.id,
-      email: user.data().email,
-      name: user.data().name,
-      lastName: user.data().lastName,
-      role: user.data().role,
-      address: user.data().address,
-      position: user.data().position,
-      createdAt: user.data().createdAt.toDate(),
-    }
-    users.push(userDto)
-  });
+  for (const userDoc of usersSnapshot.docs) {
+    const userData = userDoc.data() as UserDto;
+    userData.id = userDoc.id;
+    userData.events = [];
+    userData.events = await getUsersInformation(userDoc.id)
+    
+    users.push(userData);
+  }
   return users;
 }
 
-export const createUser = async (user: UserDto): Promise<UserDto | undefined> => {
+export const createUser = async (user: UserDto): Promise<UserDto> => {
   user.role = user.role?.toUpperCase();
   try {
     const userRecord = await admin.auth().createUser({
@@ -62,27 +57,27 @@ export const createUser = async (user: UserDto): Promise<UserDto | undefined> =>
     // 🔹 Obtener el evento actualizado
     const userDocCreated = (await userRef.get()).data() as UserDto;
     userDocCreated.events = [];
-    userDocCreated.events = await getEventsInformation(userRef.id);
+    userDocCreated.events = await getUsersInformation(userRef.id);
 
     return {
       id: userRef.id,
       ...userDocCreated
     };
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error creando usuario:", error);
-    return undefined;
+    throw Error(error.message)
   }
 }
 
-export const getById = async (id: string): Promise<UserDto | undefined> => {
-  const userRef = db
-    .collection('users');
-  const snapshot = await userRef.doc(id).get();
-  const user = snapshot.data() as UserDto;
+export const getById = async (id: string): Promise<UserDto> => {
+  const userRef = await db.collection('users').doc(id);
+  const userDocCreated = (await userRef.get()).data() as UserDto;
+  userDocCreated.events = [];
+  userDocCreated.events = await getUsersInformation(userRef.id)
   return {
-    id: snapshot.id,
-    ...snapshot.data()
-  } as UserDto;
+    id: userRef.id,
+    ...userDocCreated
+  };
 }
 
 export const getByRole = async (role: string): Promise<UserDto[] | undefined> => {
@@ -144,7 +139,7 @@ export const updateUser = async (updateUser: UserDto): Promise<UserDto | undefin
     // 🔹 Obtener el evento actualizado
     const userDocCreated = (await userRef.get()).data() as UserDto;
     userDocCreated.events = [];
-    userDocCreated.events = await getEventsInformation(userRef.id);
+    userDocCreated.events = await getUsersInformation(userRef.id);
 
     return {
       id: userRef.id,
@@ -156,7 +151,7 @@ export const updateUser = async (updateUser: UserDto): Promise<UserDto | undefin
   }
 }
 
-const getEventsInformation = async (userDocId: string): Promise<EventDto[]> => {
+const getUsersInformation = async (userDocId: string): Promise<EventDto[]> => {
   const events: EventDto[] = []
     // 🔹 Obtener el events del user
     const eventsSnapshot = await db.collection("users").doc(userDocId).collection("events").get();
