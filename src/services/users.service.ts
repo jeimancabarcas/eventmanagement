@@ -19,6 +19,8 @@ export const getAllUsers = async (): Promise<UserDto[]> => {
       name: user.data().name,
       lastName: user.data().lastName,
       role: user.data().role,
+      address: user.data().address,
+      position: user.data().position,
       createdAt: user.data().createdAt.toDate(),
     }
     users.push(userDto)
@@ -26,7 +28,7 @@ export const getAllUsers = async (): Promise<UserDto[]> => {
   return users;
 }
 
-export const createUser = async (user: UserDoc): Promise<UserDto | undefined> => {
+export const createUser = async (user: UserDto): Promise<UserDto | undefined> => {
   try {
     const userRecord = await admin.auth().createUser({
       email: user.email,
@@ -40,6 +42,8 @@ export const createUser = async (user: UserDoc): Promise<UserDto | undefined> =>
       lastName: user.lastName,
       email: user.email,
       role: user.role,
+      position: user.position,
+      address: user.address,
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
     };
 
@@ -48,7 +52,13 @@ export const createUser = async (user: UserDoc): Promise<UserDto | undefined> =>
 
     return {
       id: snapshot.id,
-      ...snapshot.data()
+      name: snapshot.data()?.name,
+      lastName: snapshot.data()?.lastName,
+      email: snapshot.data()?.email,
+      role: snapshot.data()?.role,
+      position: snapshot.data()?.position,
+      address: snapshot.data()?.address,
+      createdAt: snapshot.data()?.createdAt,
     };
   } catch (error) {
     console.error("Error creando usuario:", error);
@@ -58,14 +68,13 @@ export const createUser = async (user: UserDoc): Promise<UserDto | undefined> =>
 
 export const getById = async (id: string): Promise<UserDto | undefined> => {
   const userRef = db
-    .collection('users')
-    .withConverter({
-      toFirestore: userDtoToFirestore,
-      fromFirestore: userDtoFromFirestore
-    });
+    .collection('users');
   const snapshot = await userRef.doc(id).get();
-  const user = snapshot.data();
-  return user;
+  const user = snapshot.data() as UserDto;
+  return {
+    id: snapshot.id,
+    ...snapshot.data()
+  } as UserDto;
 }
 
 export const updateUser = async (updateUser: UserDto): Promise<UserDto | undefined> => {
@@ -80,6 +89,8 @@ export const updateUser = async (updateUser: UserDto): Promise<UserDto | undefin
       lastName: updateUser.lastName,
       email: updateUser.email,
       role: updateUser.role,
+      address: updateUser.address,
+      position: updateUser.position
     };
     await userRef.update({
       ...userData,
