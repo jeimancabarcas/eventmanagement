@@ -8,17 +8,12 @@ import "dotenv/config";
 import { UserDto } from "src/model/dto/user.dto";
 const admin = require("firebase-admin");
 
-export const getAllUsers = async (): Promise<UserDoc[]> => {
-  const usersRef = db
-    .collection('users')
-    .withConverter({
-      toFirestore: userDtoToFirestore,
-      fromFirestore: userDtoFromFirestore
-    });
-  const querySnapshot = await usersRef.get();
+export const getAllUsers = async (): Promise<UserDto[]> => {
+  const usersSnapshot = await db
+    .collection('users').get();
   const users = new Array<UserDoc>();
-  querySnapshot.forEach((doc) => {
-    users.push(doc.data())
+  usersSnapshot.forEach((user) => {
+    users.push(user.data() as UserDoc)
   });
   return users;
 }
