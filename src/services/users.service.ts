@@ -79,7 +79,7 @@ export const getById = async (id: string): Promise<UserDto | undefined> => {
 }
 
 export const getByRole = async (role: string): Promise<UserDto[] | undefined> => {
-  const snapshot = await db.collection('users').where('role', '==', role).get();
+  const snapshot = await db.collection('users').where('role', '==', role.toUpperCase()).get();
   const users: UserDto[] = [];
   snapshot.forEach(userSnapshot => {
     users.push({
