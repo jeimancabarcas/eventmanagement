@@ -189,10 +189,17 @@ export const deleteManyUsers = async (users: UserDto[]): Promise<boolean> => {
   const batch = db.batch();
   try {
     for (const user of users) {
+      try {
+        await admin.auth().getUser(user.id as string);
+        await admin.auth().deleteUser(user.id as string);
+      } catch (error: any) {}
+    }
+    for (const user of users) {
       const eventRef = db.collection("users").doc(user.id as string);
       await deleteSubcollection(eventRef, "events");
       batch.delete(eventRef);
     }
+
     await batch.commit(); // 🔥 Ejecutar la eliminación en batch
     return true;
   } catch (error) {
