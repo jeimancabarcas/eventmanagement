@@ -11,9 +11,17 @@ const admin = require("firebase-admin");
 export const getAllUsers = async (): Promise<UserDto[]> => {
   const usersSnapshot = await db
     .collection('users').get();
-  const users = new Array<UserDoc>();
+  const users = new Array<UserDto>();
   usersSnapshot.forEach((user) => {
-    users.push(user.data() as UserDoc)
+    const userDto: UserDto = {
+      id: user.data().id,
+      email: user.data().email,
+      name: user.data().name,
+      lastName: user.data().lastName,
+      role: user.data().role,
+      createdAt: user.data().createdAt.toDate(),
+    }
+    users.push(userDto)
   });
   return users;
 }
