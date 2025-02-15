@@ -6,18 +6,39 @@ import { StaffDoc } from "src/model/doc/staff.doc";
 import { UserDto } from "src/model/dto/user.dto";
 
 
-export const getAllEvents = async (): Promise<any> => {
-  const eventsRefDocs = db
-    .collection('events')
-    .withConverter({
-      toFirestore: eventDocToFirestore,
-      fromFirestore: eventDocFromFirestore
-    });
+export const getAllEvents = async (): Promise<EventDto[]> => {
+  const eventsSnapshot = await db.collection("events").get();
+  const events: EventDto[] = [];
 
-  const snapshotEvent = await eventsRefDocs.get();
-  const listEventsDoc: EventDoc[] = snapshotEvent.docs.map(doc => doc.data());
-  return listEventsDoc;
-}
+  for (const eventDoc of eventsSnapshot.docs) {
+    const eventData = eventDoc.data() as EventDto;
+    eventData.id = eventDoc.id;
+    eventData.staff = [];
+
+    // 🔹 Obtener el staff del evento
+    const staffSnapshot = await db.collection("events").doc(eventDoc.id).collection("staff").get();
+
+    for (const staffDoc of staffSnapshot.docs) {
+      const userId = staffDoc.id; // ID del usuario en la subcolección "staff"
+      const userDoc = await db.collection("users").doc(userId).get();
+
+      if (!userDoc.exists) {
+        console.warn(`⚠️ Usuario con ID ${userId} no encontrado en "users".`);
+        continue;
+      }
+
+      // 🔥 Fusionar datos de "users" y "staff"
+      eventData.staff.push({
+        id: userId,
+        ...userDoc.data(),  // Datos de la colección "users"
+      } as UserDto);
+    }
+
+    events.push(eventData);
+  }
+
+  return events;
+};
 
 export const createEvent = async (eventDto: EventDto): Promise<EventDto> => {
   const eventDoc = {

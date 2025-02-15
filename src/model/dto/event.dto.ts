@@ -3,7 +3,8 @@ import { FlightDto } from "./flight.dto"
 import { StaffDto } from "./staff.dto"
 import { UserDto } from "./user.dto"
 
-export interface   EventDto {
+export interface EventDto {
+  id?: string
   name: string
   start_date: Date
   end_date: Date
