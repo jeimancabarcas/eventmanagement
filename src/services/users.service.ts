@@ -174,9 +174,11 @@ const getUsersInformation = async (userDocId: string): Promise<EventDto[]> => {
 }
 export const deleteUser = async (id: string): Promise<boolean> => {
     try {
+      await admin.auth().getUser(id);
+      await admin.auth().deleteUser(id); 
       const userRef = db.collection("users").doc(id);
       await deleteSubcollection(userRef, "events");
-      await userRef.delete();
+      await userRef.delete(); 
       return true;
     } catch (error) {
       throw error;
