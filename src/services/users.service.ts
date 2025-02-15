@@ -4,6 +4,7 @@ import CryptoJs from "crypto-js";
 import * as jwt from 'jsonwebtoken';
 import "dotenv/config";
 import { UserDto } from "src/model/dto/user.dto";
+import { EventDto } from "src/model/dto/event.dto";
 const admin = require("firebase-admin");
 
 export const getAllUsers = async (): Promise<UserDto[]> => {
@@ -36,7 +37,7 @@ export const createUser = async (user: UserDto): Promise<UserDto | undefined> =>
     });
     await admin.auth().setCustomUserClaims(userRecord.uid, { role: user.role });
     const userRef = db.collection("users").doc(userRecord.uid);
-    const userData: UserDto= {
+    const userData: UserDto = {
       name: user.name,
       lastName: user.lastName,
       email: user.email,
@@ -113,15 +114,57 @@ export const updateUser = async (updateUser: UserDto): Promise<UserDto | undefin
       password: updateUser.password,
       displayName: updateUser.name,
     });
+    
+    // 🔹 Eliminar todos los documentos en "events" si existen
+    const eventsSnapshot = await userRef.collection("events").get();
+    const batch = db.batch();
+    eventsSnapshot.forEach((doc) => {
+      batch.delete(doc.ref);
+    });
+    await batch.commit();
+    // 🔹 Agregar nuevo staff si hay datos
+    if (updateUser.events && updateUser.events.length > 0) {
+      for (const event of updateUser.events) {
+        if (!event.id) continue; // 🔥 Evita errores si el staff no tiene ID
 
-    const updatedSnapshot = await userRef.get();
-    return updatedSnapshot.data() as UserDto;
+        const eventRef = userRef.collection("events").doc(String(event.id));
+        await eventRef.set({ id: event.id }); // 🔥 Usar `.set()` en lugar de `.create()`
+      }
+    }
+    // 🔹 Obtener el evento actualizado
+    const userDocCreated = (await userRef.get()).data() as UserDto;
+
+    return {
+      id: userRef.id,
+      ...userDocCreated
+    };
   } catch (error) {
     console.error("Error al actualizar usuario:", error);
     return undefined;
   }
 }
 
+const getEventsInformation = async (userDocId: string): Promise<EventDto[]> => {
+  const events: EventDto[] = []
+    // 🔹 Obtener el events del user
+    const eventsSnapshot = await db.collection("users").doc(userDocId).collection("events").get();
+
+    for (const doc of eventsSnapshot.docs) {
+      const eventId = doc.id;
+      const eventDoc = await db.collection("events").doc(eventId).get();
+
+      if (!eventDoc.exists) {
+        console.warn(`Event con ID ${eventId} no encontrado en "users".`);
+        continue;
+      }
+
+      events.push({
+        id: eventId,
+        ...eventDoc.data(), 
+      } as EventDto);
+    }
+  return events;
+}
 export const deleteUser = async (id: string): Promise<boolean> => {
   try {
     const userRef = admin.firestore().collection("users").doc(id);

@@ -94,7 +94,13 @@ export const updateEvent = async (eventUpdate: EventDto): Promise<EventDto | und
   if (!eventUpdate.id) return undefined; // Validar que el evento tenga un ID
 
   const eventRef = db.collection("events").doc(eventUpdate.id);
-  await eventRef.update(eventUpdate as any);
+  await eventRef.set({
+    name: eventUpdate.name,
+    start_date: eventUpdate.start_date,
+    end_date: eventUpdate.end_date,
+    artist: eventUpdate.artist,
+    place: eventUpdate.place
+  });
 
   // 🔹 Eliminar todos los documentos en "staff" si existen
   const staffSnapshot = await eventRef.collection("staff").get();

@@ -1,3 +1,5 @@
+import { EventDto } from "./event.dto"
+
 export interface UserDto {
   id?: string,
   name?: string,
@@ -9,5 +11,6 @@ export interface UserDto {
   address?: string,
   flights?: any[],
   hotels?: any[],
+  events?: EventDto[],
   createdAt?: Date
 }
