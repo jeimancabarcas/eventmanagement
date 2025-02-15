@@ -3,6 +3,7 @@ import { db } from "../config/firebase";
 import { EventDto, eventDtoFromFirestore, eventDtoToFirestore } from "../model/dto/event.dto";
 import { StaffDto, staffDtoFromFirestore, staffDtoToFirestore } from "../model/dto/staff.dto";
 import { StaffDoc } from "src/model/doc/staff.doc";
+import { UserDto } from "src/model/dto/user.dto";
 
 
 export const getAllEvents = async (): Promise<any> => {
@@ -18,28 +19,54 @@ export const getAllEvents = async (): Promise<any> => {
   return listEventsDoc;
 }
 
-export const createEvent = async (eventDto: EventDto): Promise<EventDoc> => {
-  const eventDoc: EventDoc = {
+export const createEvent = async (eventDto: EventDto): Promise<EventDto> => {
+  const eventDoc = {
     artist: eventDto.artist,
     name: eventDto.name,
     start_date: eventDto.start_date,
     end_date: eventDto.end_date,
     place: eventDto.place,
-  }
-  const eventRef = await db.
-    collection('events').add(eventDoc);
+  };
 
-  if (eventDto.staff) {
-    eventDto.staff.forEach(async (staff: StaffDto) => {
-      await eventRef.collection('staff').add({
-        staffRef: staff.staffRef,
-        flights: staff.flights
-      })
-    })
+  // 🔹 Agregar el evento y obtener su referencia
+  const eventRef = await db.collection("events").add(eventDoc);
+
+  // 🔹 Validar si hay staff y agregarlo a la subcolección "staff"
+  if (eventDto.staff && eventDto.staff.length > 0) {
+    for (const staff of eventDto.staff) {
+      if (!staff.id) continue; // 🔥 Evita errores si el staff no tiene ID
+
+      const staffRef = eventRef.collection("staff").doc(String(staff.id)); // Puedes agregar más información si lo necesitas
+      staffRef.create({id: staff.id})
+    }
   }
-  const eventDocCreated: EventDoc = (await eventRef.get()).data() as EventDoc;
+
+  // 🔹 Obtener el evento creado
+  const eventDocCreated = (await eventRef.get()).data() as EventDto;
+  eventDocCreated.staff = [];
+
+  // 🔹 Obtener los documentos de staff
+  const staffsCreated = await eventRef.collection("staff").get();
+
+  // 🔹 Obtener la información de cada usuario desde "users"
+  for (const staffDoc of staffsCreated.docs) {
+    const userId = staffDoc.id; // El ID de staff es el mismo que en "users"
+    const userDoc = await db.collection("users").doc(userId).get();
+
+    if (!userDoc.exists) {
+      console.warn(`⚠️ Usuario con ID ${userId} no encontrado en "users".`);
+      continue;
+    }
+
+    // 🔥 Fusionamos los datos de "staff" con los datos del usuario desde "users"
+    eventDocCreated.staff.push({
+      id: userId,
+      ...userDoc.data(),  // Datos de la colección "users"
+    } as UserDto);
+  }
+
   return eventDocCreated;
-}
+};
 
 export const getByIdEvent = async (id: string): Promise<EventDoc | undefined> => {
   const eventRef = await db

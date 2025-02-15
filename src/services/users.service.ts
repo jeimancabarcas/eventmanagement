@@ -1,6 +1,4 @@
-import { UserDoc, userDtoFromFirestore, userDtoToFirestore } from "../model/doc/user.doc";
 import { db } from "../config/firebase";
-//import { auth } from "../config/firebase";
 import { DtoToken } from "../model/doc/token";
 import CryptoJs from "crypto-js";
 import * as jwt from 'jsonwebtoken';
@@ -29,7 +27,7 @@ export const getAllUsers = async (): Promise<UserDto[]> => {
 }
 
 export const createUser = async (user: UserDto): Promise<UserDto | undefined> => {
-  user.role = user.role.toUpperCase();
+  user.role = user.role?.toUpperCase();
   try {
     const userRecord = await admin.auth().createUser({
       email: user.email,
@@ -42,7 +40,7 @@ export const createUser = async (user: UserDto): Promise<UserDto | undefined> =>
       name: user.name,
       lastName: user.lastName,
       email: user.email,
-      role: user.role.toUpperCase(),
+      role: user.role?.toUpperCase(),
       position: user.position,
       address: user.address,
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
@@ -91,7 +89,7 @@ export const getByRole = async (role: string): Promise<UserDto[] | undefined> =>
 }
 
 export const updateUser = async (updateUser: UserDto): Promise<UserDto | undefined> => {
-  updateUser.role = updateUser.role.toUpperCase();
+  updateUser.role = updateUser.role?.toUpperCase();
   try {
     const userRef = db.collection("users").doc(updateUser.id as string);
     const snapshot = await userRef.get();

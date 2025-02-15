@@ -1,14 +1,15 @@
 import { firestore } from "firebase-admin"
 import { FlightDto } from "./flight.dto"
 import { StaffDto } from "./staff.dto"
+import { UserDto } from "./user.dto"
 
-export interface EventDto {
+export interface   EventDto {
   name: string
   start_date: Date
   end_date: Date
   artist: string
   place: string
-  staff?: StaffDto[]
+  staff?: UserDto[] | null
 }
 
 //function mapStaff(arg: any): [FlightDto] | undefined {
