@@ -31,23 +31,18 @@ export const GetAllEvents = async (req: Request, res: Response) => {
 export const GetByIdEvent = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
-    const eventToFind = await getByIdEvent(id);
-    res.status(200).json({ "Event finded": eventToFind });
+    const response = await getByIdEvent(id);
+    res.status(200).json(response);
   } catch (error: any) {
     res.status(500).send(error.message);
   }
 }
 
 export const UpdateEvent = async (req: Request, res: Response) => {
-  const id: string = req.params.id;
   const eventDto: EventDto = req.body;
   try {
-    const eventUpdate = await updateEvent(id, eventDto);
-    res.status(200).json({
-      "Message": "Updated event suscessfull",
-      "Event": eventUpdate
-    }
-    );
+    const response = await updateEvent(eventDto);
+    res.status(200).json(response);
   } catch (error: any) {
     res.status(500).send(error.message);
   }

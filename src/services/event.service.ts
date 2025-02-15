@@ -14,26 +14,8 @@ export const getAllEvents = async (): Promise<EventDto[]> => {
     const eventData = eventDoc.data() as EventDto;
     eventData.id = eventDoc.id;
     eventData.staff = [];
-
-    // 🔹 Obtener el staff del evento
-    const staffSnapshot = await db.collection("events").doc(eventDoc.id).collection("staff").get();
-
-    for (const staffDoc of staffSnapshot.docs) {
-      const userId = staffDoc.id; // ID del usuario en la subcolección "staff"
-      const userDoc = await db.collection("users").doc(userId).get();
-
-      if (!userDoc.exists) {
-        console.warn(`⚠️ Usuario con ID ${userId} no encontrado en "users".`);
-        continue;
-      }
-
-      // 🔥 Fusionar datos de "users" y "staff"
-      eventData.staff.push({
-        id: userId,
-        ...userDoc.data(),  // Datos de la colección "users"
-      } as UserDto);
-    }
-
+    eventData.staff = await getStaffsInformation(eventDoc.id)
+    
     events.push(eventData);
   }
 
@@ -65,121 +47,119 @@ export const createEvent = async (eventDto: EventDto): Promise<EventDto> => {
   // 🔹 Obtener el evento creado
   const eventDocCreated = (await eventRef.get()).data() as EventDto;
   eventDocCreated.staff = [];
+  eventDocCreated.staff = await getStaffsInformation(eventRef.id)
 
-  // 🔹 Obtener los documentos de staff
-  const staffsCreated = await eventRef.collection("staff").get();
-
-  // 🔹 Obtener la información de cada usuario desde "users"
-  for (const staffDoc of staffsCreated.docs) {
-    const userId = staffDoc.id; // El ID de staff es el mismo que en "users"
-    const userDoc = await db.collection("users").doc(userId).get();
-
-    if (!userDoc.exists) {
-      console.warn(`⚠️ Usuario con ID ${userId} no encontrado en "users".`);
-      continue;
-    }
-
-    // 🔥 Fusionamos los datos de "staff" con los datos del usuario desde "users"
-    eventDocCreated.staff.push({
-      id: userId,
-      ...userDoc.data(),  // Datos de la colección "users"
-    } as UserDto);
-  }
-
-  return eventDocCreated;
+  return {
+    id: eventRef.id,
+    ...eventDocCreated
+  };
 };
 
+
 export const getByIdEvent = async (id: string): Promise<EventDoc | undefined> => {
-  const eventRef = await db
-    .collection('events')
-    .withConverter({
-      toFirestore: eventDocToFirestore,
-      fromFirestore: eventDocFromFirestore
-    }).doc(id).get();
-
-  return eventRef.data();
+  const eventRef = await db.collection('events').doc(id);
+  const eventDocCreated = (await eventRef.get()).data() as EventDto;
+  eventDocCreated.staff = [];
+  eventDocCreated.staff = await getStaffsInformation(eventRef.id)
+  return {
+    id: eventRef.id,
+    ...eventDocCreated
+  };
 }
 
-export const updateEvent = async (id: string, eventUpdate: EventDto): Promise<EventDto | undefined> => {
-  const eventDoc: EventDoc = {
-    name: eventUpdate?.name,
-    artist: eventUpdate?.artist,
-    start_date: eventUpdate?.start_date,
-    end_date: eventUpdate?.end_date,
-    place: eventUpdate?.place
-  }
-  const eventRef = await db.collection('events')
-    .withConverter({
-      toFirestore: eventDocToFirestore,
-      fromFirestore: eventDocFromFirestore
-    }).doc(id).update({ ...eventDoc });
+const getStaffsInformation = async (eventDocId: string): Promise<UserDto[]> => {
+  const staffs:UserDto[] = []
+    // 🔹 Obtener el staff del evento
+    const staffSnapshot = await db.collection("events").doc(eventDocId).collection("staff").get();
 
-  if (eventUpdate.staff) {
-    const staffRefDoc = await db.collection('events').doc(id)
-      .collection('staff')
-      .withConverter({
-        toFirestore: staffDtoToFirestore,
-        fromFirestore: staffDtoFromFirestore
-      }).get();
+    for (const staffDoc of staffSnapshot.docs) {
+      const userId = staffDoc.id; // ID del usuario en la subcolección "staff"
+      const userDoc = await db.collection("users").doc(userId).get();
 
-    eventUpdate.staff.forEach((staff: StaffDto) => {
-      staff.flights?.forEach((flighs) => {
-        const staffDto: StaffDoc = {
-          staffRef: staff.staffRef,
-          flights: [
-            {
-              departure: flighs.departure,
-              departureTime: flighs.departureTime,
-              destination: flighs.destination,
-              airline: flighs.airline,
-              arrivalTime: flighs.arrivalTime,
-              flightNumber: flighs.flightNumber
-            }
-          ]
-        }
-        staffRefDoc.docs.filter(async (doc) => {
-          if (doc.data().staffRef == staff.staffRef) {
-            console.log({ id, ...doc.data() });
-            const idStaff: string = doc.id;
-            console.log(idStaff);
-            await db.collection('events').doc(id).collection('staff').doc(idStaff).update({ ...staffDto })
-          }
-        });
+      if (!userDoc.exists) {
+        console.warn(`⚠️ Usuario con ID ${userId} no encontrado en "users".`);
+        continue;
+      }
 
-      })
-    })
-  }
-  const updatedEventRef = await db.collection('events')
-    .withConverter({
-      toFirestore: eventDtoToFirestore,
-      fromFirestore: eventDtoFromFirestore
-    }).doc(id).get();
-  const updatedEventDoc: EventDto | undefined = updatedEventRef.data();
-  return updatedEventDoc;
+      // 🔥 Fusionar datos de "users" y "staff"
+      staffs.push({
+        id: userId,
+        ...userDoc.data(),  // Datos de la colección "users"
+      } as UserDto);
+    }
+  return staffs;
 }
+
+export const updateEvent = async (eventUpdate: EventDto): Promise<EventDto | undefined> => {
+  if (!eventUpdate.id) return undefined; // Validar que el evento tenga un ID
+
+  const eventRef = db.collection("events").doc(eventUpdate.id);
+  await eventRef.update(eventUpdate as any);
+
+  // 🔹 Eliminar todos los documentos en "staff" si existen
+  const staffSnapshot = await eventRef.collection("staff").get();
+  const batch = db.batch();
+
+  staffSnapshot.forEach((doc) => {
+    batch.delete(doc.ref);
+  });
+
+  await batch.commit(); // 🔥 Ejecuta la eliminación en batch
+
+  // 🔹 Agregar nuevo staff si hay datos
+  if (eventUpdate.staff && eventUpdate.staff.length > 0) {
+    for (const staff of eventUpdate.staff) {
+      if (!staff.id) continue; // 🔥 Evita errores si el staff no tiene ID
+
+      const staffRef = eventRef.collection("staff").doc(String(staff.id));
+      await staffRef.set({ id: staff.id }); // 🔥 Usar `.set()` en lugar de `.create()`
+    }
+  }
+
+  // 🔹 Obtener el evento actualizado
+  const eventDocCreated = (await eventRef.get()).data() as EventDto;
+  eventDocCreated.staff = await getStaffsInformation(eventUpdate.id);
+
+  return {
+    id: eventDocCreated.id,
+    ...eventDocCreated
+  };
+};
 
 export const deleteEvent = async (id: string): Promise<boolean> => {
   try {
-    const eventRef = await db.collection('events').doc(id).delete();
+    const eventRef = db.collection("events").doc(id);
+    await deleteSubcollection(eventRef, "staff");
+    await eventRef.delete();
     return true;
   } catch (error) {
-    throw (error)
+    throw error;
   }
-}
+};
 
 export const deleteManyEvents = async (ids: string[]): Promise<boolean> => {
   const batch = db.batch();
 
   try {
-    ids.forEach(id => {
-      const eventRef = db.collection('events').doc(id);
+    for (const id of ids) {
+      const eventRef = db.collection("events").doc(id);
+      await deleteSubcollection(eventRef, "staff");
       batch.delete(eventRef);
-    });
-
-    await batch.commit(); // Ejecuta la eliminación en batch
+    }
+    await batch.commit(); // 🔥 Ejecutar la eliminación en batch
     return true;
   } catch (error) {
-    console.error("Error al eliminar eventos:", error);
     throw error;
   }
-}
+};
+
+const deleteSubcollection = async (parentRef: FirebaseFirestore.DocumentReference, subcollection: string) => {
+  const subcollectionRef = parentRef.collection(subcollection);
+  const snapshot = await subcollectionRef.get();
+
+  if (snapshot.empty) return; // No hay documentos, no es necesario eliminar
+
+  const batch = db.batch();
+  snapshot.forEach((doc) => batch.delete(doc.ref));
+  await batch.commit();
+};
