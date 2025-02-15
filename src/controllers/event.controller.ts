@@ -3,17 +3,10 @@ import { createEvent, getAllEvents, getByIdEvent, updateEvent, deleteEvent, dele
 import { EventDto } from "../model/dto/event.dto";
 
 export const CreateEvent = async (req: Request, res: Response) => {
-  const eventDto: EventDto = {
-    ...req.body
-  };
-
+  const eventDto: EventDto = req.body;
   try {
-    const eventCreate = await createEvent(eventDto);
-    res.status(200).json({
-      "Message": "Evento Creado con éxito",
-      "Evento": eventCreate
-    }
-    );
+    const response = await createEvent(eventDto);
+    res.status(200).json(response);
   } catch (error: any) {
     res.status(500).send(error.message);
   }
@@ -21,8 +14,8 @@ export const CreateEvent = async (req: Request, res: Response) => {
 
 export const GetAllEvents = async (req: Request, res: Response) => {
   try {
-    const allEvents = await getAllEvents();
-    res.status(200).json(allEvents);
+    const response = await getAllEvents();
+    res.status(200).json(response);
   } catch (error: any) {
     res.status(500).send(error.message);
   }
@@ -51,8 +44,8 @@ export const UpdateEvent = async (req: Request, res: Response) => {
 export const DeleteEvent = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
-    const userDelete = await deleteEvent(id);
-    res.status(200).send(userDelete);
+    const response = await deleteEvent(id);
+    res.status(200).send(response);
   } catch (error) {
     res.status(500);
   }
