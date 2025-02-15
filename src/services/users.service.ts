@@ -29,6 +29,7 @@ export const getAllUsers = async (): Promise<UserDto[]> => {
 }
 
 export const createUser = async (user: UserDto): Promise<UserDto | undefined> => {
+  user.role = user.role.toUpperCase();
   try {
     const userRecord = await admin.auth().createUser({
       email: user.email,
@@ -41,7 +42,7 @@ export const createUser = async (user: UserDto): Promise<UserDto | undefined> =>
       name: user.name,
       lastName: user.lastName,
       email: user.email,
-      role: user.role,
+      role: user.role.toUpperCase(),
       position: user.position,
       address: user.address,
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
@@ -77,7 +78,20 @@ export const getById = async (id: string): Promise<UserDto | undefined> => {
   } as UserDto;
 }
 
+export const getByRole = async (role: string): Promise<UserDto[] | undefined> => {
+  const snapshot = await db.collection('users').where('role', '==', role).get();
+  const users: UserDto[] = [];
+  snapshot.forEach(userSnapshot => {
+    users.push({
+      id: userSnapshot.id,
+      ...userSnapshot.data()
+    } as UserDto)
+  });
+  return users;
+}
+
 export const updateUser = async (updateUser: UserDto): Promise<UserDto | undefined> => {
+  updateUser.role = updateUser.role.toUpperCase();
   try {
     const userRef = db.collection("users").doc(updateUser.id as string);
     const snapshot = await userRef.get();

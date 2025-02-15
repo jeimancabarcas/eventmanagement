@@ -1,5 +1,5 @@
 import { DtoToken } from "../model/doc/token";
-import { getAllUsers, createUser, getById, authUser, updateUser, deleteUser, deleteManyUsers } from "../services/users.service";
+import { getAllUsers, createUser, getById, authUser, updateUser, deleteUser, deleteManyUsers, getByRole } from "../services/users.service";
 import { Request, Response } from "express";
 import CryptoJS from "crypto-js";
 import "dotenv/config";
@@ -79,6 +79,16 @@ export const GetById = async (req: Request, res: Response) => {
   try {
     const userToFind = await getById(id);
     res.status(200).json({ "User finded": userToFind });
+  } catch (error: any) {
+    res.status(500).send(error.message);
+  }
+}
+
+export const GetByRole = async (req: Request, res: Response) => {
+  const { role } = req.params;
+  try {
+    const response = await getByRole(role);
+    res.status(200).json(response);
   } catch (error: any) {
     res.status(500).send(error.message);
   }
