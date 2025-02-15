@@ -98,7 +98,7 @@ export const updateUser = async (updateUser: UserDto): Promise<UserDto | undefin
 
 export const deleteUser = async (id: string): Promise<string> => {
   try {
-    const userRef = admin.firestore().collection("users").doc(id);
+    const userRef = db.collection("users").doc(id);
     const snapshot = await userRef.get();
 
     if (!snapshot.exists) {

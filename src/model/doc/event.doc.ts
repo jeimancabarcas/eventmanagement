@@ -8,13 +8,6 @@ export interface EventDoc {
   artist: string
   place: string
 }
-//function matListFlight(arg: any) {
-//  const fligDoc = new Array<FlightDoc>();
-//  for (const flight of arg.staff.flight) {
-//    fligDoc.push(flight);
-//  }
-//  return fligDoc;
-//}
 
 export function eventDocToFirestore(eventDoc: EventDoc): firestore.DocumentData {
   return {

@@ -8,10 +8,10 @@ export const CreateEvent = async (req: Request, res: Response) => {
   };
 
   try {
-    const eventCreate = await createEvent(eventDto);
+    const eventCreated = await createEvent(eventDto);
     res.status(200).json({
       "Message": "Evento Creado con éxito",
-      "Evento": eventCreate
+      "Evento": eventCreated
     }
     );
   } catch (error: any) {
