@@ -48,17 +48,25 @@ export const createUser = async (user: UserDto): Promise<UserDto | undefined> =>
     };
 
     await userRef.set(userData);
-    const snapshot = await userRef.get();
+    // 🔹 Agregar nuevo staff si hay datos
+    if (user.events && user.events.length > 0) {
+      for (const event of user.events) {
+        if (!event.id) continue; // 🔥 Evita errores si el staff no tiene ID
+
+        const userEventRef = userRef.collection("events").doc(String(event.id));
+        await userEventRef.set({ id: event.id }); 
+        const eventRef = db.collection("events").doc(String(event.id)).collection('staff').doc(userRef.id);
+        await eventRef.set({ id: userRef.id }); 
+      }
+    }
+    // 🔹 Obtener el evento actualizado
+    const userDocCreated = (await userRef.get()).data() as UserDto;
+    userDocCreated.events = [];
+    userDocCreated.events = await getEventsInformation(userRef.id);
 
     return {
-      id: snapshot.id,
-      name: snapshot.data()?.name,
-      lastName: snapshot.data()?.lastName,
-      email: snapshot.data()?.email,
-      role: snapshot.data()?.role,
-      position: snapshot.data()?.position,
-      address: snapshot.data()?.address,
-      createdAt: snapshot.data()?.createdAt,
+      id: userRef.id,
+      ...userDocCreated
     };
   } catch (error) {
     console.error("Error creando usuario:", error);
@@ -127,12 +135,16 @@ export const updateUser = async (updateUser: UserDto): Promise<UserDto | undefin
       for (const event of updateUser.events) {
         if (!event.id) continue; // 🔥 Evita errores si el staff no tiene ID
 
-        const eventRef = userRef.collection("events").doc(String(event.id));
-        await eventRef.set({ id: event.id }); // 🔥 Usar `.set()` en lugar de `.create()`
+        const userEventRef = userRef.collection("events").doc(String(event.id));
+        await userEventRef.set({ id: event.id }); 
+        const eventRef = db.collection("events").doc(String(event.id)).collection('staff').doc(userRef.id);
+        await eventRef.set({ id: userRef.id }); 
       }
     }
     // 🔹 Obtener el evento actualizado
     const userDocCreated = (await userRef.get()).data() as UserDto;
+    userDocCreated.events = [];
+    userDocCreated.events = await getEventsInformation(userRef.id);
 
     return {
       id: userRef.id,
