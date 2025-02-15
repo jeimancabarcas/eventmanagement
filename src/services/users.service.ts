@@ -99,20 +99,20 @@ export const updateUser = async (updateUser: UserDto): Promise<UserDto | undefin
   }
 }
 
-export const deleteUser = async (id: string): Promise<string> => {
+export const deleteUser = async (id: string): Promise<boolean> => {
   try {
     const userRef = admin.firestore().collection("users").doc(id);
     const snapshot = await userRef.get();
 
     if (!snapshot.exists) {
-      return `Usuario con ID ${id} no encontrado en Firestore.`;
+      return false;
     }
 
     try {
       await admin.auth().getUser(id);
     } catch (error: any) {
       if (error.code === "auth/user-not-found") {
-        return `Usuario con ID ${id} no encontrado en Firebase Authentication.`;
+        return false;
       }
       throw error; 
     }
@@ -121,14 +121,14 @@ export const deleteUser = async (id: string): Promise<string> => {
     await userRef.delete(); 
     await admin.auth().deleteUser(id); 
 
-    return `Usuario con ID ${id} eliminado correctamente.`;
+    return true;
   } catch (error) {
     console.error("Error al eliminar usuario:", error);
-    return "Error al eliminar el usuario. Inténtalo nuevamente.";
+    return false;
   }
 };
 
-export const deleteManyUsers = async (users: UserDto[]): Promise<string> => {
+export const deleteManyUsers = async (users: UserDto[]): Promise<boolean> => {
   const batch = admin.firestore().batch();
 
   try {
@@ -158,10 +158,10 @@ export const deleteManyUsers = async (users: UserDto[]): Promise<string> => {
       }
     }
 
-    return "Usuarios eliminados correctamente.";
+    return true;
   } catch (error) {
     console.error("Error al eliminar usuarios:", error);
-    return "Error al eliminar usuarios. Inténtalo nuevamente.";
+    throw Error("Error al eliminar usuarios. Inténtalo nuevamente.");
   }
 };
 
