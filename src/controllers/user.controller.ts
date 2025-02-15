@@ -1,5 +1,5 @@
 import { DtoToken } from "../model/doc/token";
-import { getAllUsers, createUser, getById, authUser, updateUser, deleteUser } from "../services/users.service";
+import { getAllUsers, createUser, getById, authUser, updateUser, deleteUser, deleteManyUsers } from "../services/users.service";
 import { Request, Response } from "express";
 import CryptoJS from "crypto-js";
 import "dotenv/config";
@@ -59,6 +59,15 @@ export const DeleteUser = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
     const userDelete = await deleteUser(id);
+    res.status(200).send(userDelete);
+  } catch (error) {
+
+  }
+}
+
+export const DeleteManyUsers = async (req: Request, res: Response) => {
+  try {
+    const userDelete = await deleteManyUsers(req.body);
     res.status(200).send(userDelete);
   } catch (error) {
 

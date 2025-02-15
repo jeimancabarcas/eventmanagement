@@ -125,6 +125,43 @@ export const deleteUser = async (id: string): Promise<string> => {
   }
 };
 
+export const deleteManyUsers = async (users: UserDto[]): Promise<string> => {
+  const batch = admin.firestore().batch();
+
+  try {
+    // 🔹 Eliminar usuarios en batch de Firestore
+    users.forEach((user: UserDto) => {
+      const userRef = admin.firestore().collection("users").doc(user.id as string);
+      batch.delete(userRef);
+
+      // Si también tienes eventos asociados, puedes eliminarlos aquí
+      const eventRef = admin.firestore().collection("events").doc(user.id as string);
+      batch.delete(eventRef);
+    });
+
+    await batch.commit();
+
+    for (const user of users) {
+      try {
+        await admin.auth().getUser(user.id as string);
+        
+        await admin.auth().deleteUser(user.id as string);
+      } catch (error: any) {
+        if (error.code === "auth/user-not-found") {
+          console.warn(`Usuario con ID ${user.id} no encontrado en Firebase Authentication.`);
+        } else {
+          throw error; 
+        }
+      }
+    }
+
+    return "Usuarios eliminados correctamente.";
+  } catch (error) {
+    console.error("Error al eliminar usuarios:", error);
+    return "Error al eliminar usuarios. Inténtalo nuevamente.";
+  }
+};
+
 export const authUser = async (dtoToken: DtoToken) => {
   const userTofind = await db.collection('users').where("name", "==", dtoToken.name).limit(1).get();
   if (userTofind.empty) {
