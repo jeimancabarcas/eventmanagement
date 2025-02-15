@@ -14,7 +14,7 @@ export const getAllUsers = async (): Promise<UserDto[]> => {
   const users = new Array<UserDto>();
   usersSnapshot.forEach((user) => {
     const userDto: UserDto = {
-      id: user.data().id,
+      id: user.id,
       email: user.data().email,
       name: user.data().name,
       lastName: user.data().lastName,
