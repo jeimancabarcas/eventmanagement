@@ -1,6 +1,7 @@
 import { UserDto } from "../dto/user.dto"
 
 export interface FlightDoc {
+  parentId?: string
   id?:string
   departure?: string 
   destination?: string 

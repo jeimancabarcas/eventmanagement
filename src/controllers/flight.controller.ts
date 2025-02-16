@@ -24,11 +24,10 @@ export const GetAllFlights = async (req: Request, res: Response) => {
     res.status(500).send(error.message);
   }
 }
-
 export const GetByIdFlight = async (req: Request, res: Response) => {
   const { userId, flightId } = req.params;
   try {
-    const response = await getByIdFlight(userId);
+    const response = await getByIdFlight(userId, flightId);
     res.status(200).json(response);
   } catch (error: any) {
     res.status(500).send(error.message);
@@ -46,9 +45,9 @@ export const UpdateFlight = async (req: Request, res: Response) => {
 }
 
 export const DeleteFlight = async (req: Request, res: Response) => {
-  const { id } = req.params;
+  const { userId, flightId } = req.params;
   try {
-    const response = await deleteFlight(id);
+    const response = await deleteFlight(userId, flightId);
     res.status(200).send(response);
   } catch (error) {
     res.status(500);

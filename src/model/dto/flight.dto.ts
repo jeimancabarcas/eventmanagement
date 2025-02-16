@@ -1,5 +1,8 @@
+import { UserDto } from "./user.dto"
+
 export interface FlightDto {
   id?:string
+  parentId?: string,
   departure: string 
   destination: string 
   departureTime: Date
@@ -7,5 +10,6 @@ export interface FlightDto {
   airline: string
   flightNumber: string
   cost: number
+  user?: UserDto;
 }
 
