@@ -4,6 +4,7 @@ import { EventDto, eventDtoFromFirestore, eventDtoToFirestore } from "../model/d
 import { StaffDto, staffDtoFromFirestore, staffDtoToFirestore } from "../model/dto/staff.dto";
 import { StaffDoc } from "src/model/doc/staff.doc";
 import { UserDto } from "src/model/dto/user.dto";
+const admin = require("firebase-admin");
 
 
 export const getAllEvents = async (): Promise<EventDto[]> => {
@@ -22,12 +23,30 @@ export const getAllEvents = async (): Promise<EventDto[]> => {
   return events;
 };
 
+export const getComingEvents = async (): Promise<EventDto[]> => {
+  const eventsSnapshot = await db.collection("events")
+    .where("start_date", ">=", admin.firestore.Timestamp.fromDate(new Date()))
+    .get();
+  const events: EventDto[] = [];
+
+  for (const eventDoc of eventsSnapshot.docs) {
+    const eventData = eventDoc.data() as EventDto;
+    eventData.id = eventDoc.id;
+    eventData.staff = [];
+    eventData.staff = await getStaffsInformation(eventDoc.id)
+    
+    events.push(eventData);
+  }
+
+  return events;
+};
+
 export const createEvent = async (eventDto: EventDto): Promise<EventDto> => {
   const eventDoc = {
     artist: eventDto.artist,
     name: eventDto.name,
-    start_date: eventDto.start_date,
-    end_date: eventDto.end_date,
+    start_date: admin.firestore.Timestamp.fromDate(eventDto.start_date),
+    end_date: admin.firestore.Timestamp.fromDate(eventDto.end_date),
     place: eventDto.place,
   };
 
@@ -94,10 +113,11 @@ export const updateEvent = async (eventUpdate: EventDto): Promise<EventDto | und
   if (!eventUpdate.id) return undefined; // Validar que el evento tenga un ID
 
   const eventRef = db.collection("events").doc(eventUpdate.id);
+  console.log(eventUpdate)
   await eventRef.set({
     name: eventUpdate.name,
-    start_date: eventUpdate.start_date,
-    end_date: eventUpdate.end_date,
+    start_date: admin.firestore.Timestamp.fromDate(new Date(eventUpdate.start_date)),
+    end_date: admin.firestore.Timestamp.fromDate(new Date(eventUpdate.end_date)),
     artist: eventUpdate.artist,
     place: eventUpdate.place
   });

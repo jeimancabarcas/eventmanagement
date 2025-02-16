@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { createEvent, getAllEvents, getByIdEvent, updateEvent, deleteEvent, deleteManyEvents } from "../services/event.service";
+import { createEvent, getByIdEvent, updateEvent, deleteEvent, deleteManyEvents, getComingEvents, getAllEvents } from "../services/event.service";
 import { EventDto } from "../model/dto/event.dto";
 
 export const CreateEvent = async (req: Request, res: Response) => {
@@ -15,6 +15,15 @@ export const CreateEvent = async (req: Request, res: Response) => {
 export const GetAllEvents = async (req: Request, res: Response) => {
   try {
     const response = await getAllEvents();
+    res.status(200).json(response);
+  } catch (error: any) {
+    res.status(500).send(error.message);
+  }
+}
+
+export const GetComingEvents = async (req: Request, res: Response) => {
+  try {
+    const response = await getComingEvents();
     res.status(200).json(response);
   } catch (error: any) {
     res.status(500).send(error.message);
