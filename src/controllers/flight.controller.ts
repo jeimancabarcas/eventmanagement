@@ -5,21 +5,12 @@ import { FlightDoc } from "src/model/doc/flight.doc";
 
 export const CreateFlight = async (req: Request, res: Response) => {
   const { departure, destination, departureTime, arrivalTime, airline, flightNumber} = req.body;
-  const flightDoc: FlightDoc = {
-    departure,
-    destination,
-    departureTime,
-    arrivalTime,
-    airline,
-    flightNumber
+  const flightDoc: FlightDto = {
+    ...req.body
   };
   try {
-    //const flightCreate = await createFlight({...flightDoc });
-    res.status(200).json({
-      "Message": "Evento Creado con éxito",
-     // "Evento": flightCreate
-    }
-    );
+    const response = await createFlight({...flightDoc });
+    res.status(200).json(response);
   } catch (error: any) {
     res.status(500).send(error.message);
   }
@@ -27,33 +18,28 @@ export const CreateFlight = async (req: Request, res: Response) => {
 
 export const GetAllFlights = async (req: Request, res: Response) => {
   try {
-    const allFlights = await getAllFights();
-    res.status(200).json(allFlights);
+    const response = await getAllFights();
+    res.status(200).json(response);
   } catch (error: any) {
     res.status(500).send(error.message);
   }
 }
 
 export const GetByIdFlight = async (req: Request, res: Response) => {
-  const { id } = req.params;
+  const { userId, flightId } = req.params;
   try {
-    const flightToFind = await getByIdFlight(id);
-    res.status(200).json({ "Event finded": flightToFind });
+    const response = await getByIdFlight(userId);
+    res.status(200).json(response);
   } catch (error: any) {
     res.status(500).send(error.message);
   }
 }
 
 export const UpdateFlight = async (req: Request, res: Response) => {
-  const id: string = req.params.id;
   const flightDto: FlightDto = req.body;
   try {
-    const flightUpdate = await updateFlight(flightDto);
-    res.status(200).json({
-      "Message": "Updated event suscessfull",
-      "Event": flightUpdate
-    }
-    );
+    const response = await updateFlight(flightDto);
+    res.status(200).json(response);
   } catch (error: any) {
     res.status(500).send(error.message);
   }
@@ -62,17 +48,16 @@ export const UpdateFlight = async (req: Request, res: Response) => {
 export const DeleteFlight = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
-    const flightDelete = await deleteFlight(id);
-    res.status(200).send(flightDelete);
+    const response = await deleteFlight(id);
+    res.status(200).send(response);
   } catch (error) {
     res.status(500);
   }
 }
 
 export const DeleteManyFlight = async (req: Request, res: Response) => {
-  const { ids } = req.body;
   try {
-    const response = await deleteManyFlights(ids);
+    const response = await deleteManyFlights(req.body);
     res.status(200).send(response);
   } catch (error) {
     res.status(500);
