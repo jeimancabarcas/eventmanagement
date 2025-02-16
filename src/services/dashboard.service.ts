@@ -1,3 +1,4 @@
+import { UserDto } from "src/model/dto/user.dto";
 import { db } from "../config/firebase";
 import { EventDto} from "../model/dto/event.dto";
 import { StatsDto } from "src/controllers/dashboard.controller";
@@ -20,6 +21,7 @@ export const getStats = async (): Promise<StatsDto> => {
   const flightExpenses = await getFlightExpenses();
   statsDto.totalFlightExpensesForActiveEvents = flightExpenses.expensesActiveEvents;
   statsDto.totalFlightExpensesForClosedEvents = flightExpenses.expensesClosedEvents;
+  statsDto.staffHiredWithActiveEvents = (await getUsersWithActiveEvents()).length;
 
   return statsDto;
 };
@@ -93,3 +95,52 @@ const getFlightExpenses = async(): Promise<{expensesActiveEvents: number, expens
     expensesClosedEvents: totalFlightExpensesForClosedEvents
   }
 }
+
+export const getUsersWithActiveEvents = async (): Promise<UserDto[]> => {
+  try {
+    let usersWithActiveEvents: any[] = [];
+
+    // 1️⃣ Obtener eventos activos (endDate >= ahora)
+    const activeEventsSnapshot = await db.collection("events")
+        .where("end_date", ">=", admin.firestore.Timestamp.fromDate(new Date()))
+        .get();
+
+    if (activeEventsSnapshot.empty) {
+        console.log("No hay eventos activos.");
+        return [];
+    }
+
+    // 2️⃣ Obtener los eventId de los eventos activos
+    const activeEventIds = activeEventsSnapshot.docs.map(doc => doc.id);
+
+    console.log("Eventos activos:", activeEventIds);
+
+    // 3️⃣ Obtener todos los usuarios
+    const usersSnapshot = await db.collection("users").get();
+
+    for (const userDoc of usersSnapshot.docs) {
+        const userId = userDoc.id;
+        
+        // 4️⃣ Obtener la subcolección "events" de cada usuario
+        const userEventsSnapshot = await db.collection("users")
+            .doc(userId)
+            .collection("events")
+            .get();
+
+        if (userEventsSnapshot.empty) continue; // Si no tiene eventos, lo ignoramos
+
+        // 5️⃣ Filtrar si al menos uno de sus eventos está en la lista de eventos activos
+        const hasActiveEvent = userEventsSnapshot.docs.some(doc => activeEventIds.includes(doc.id));
+
+        if (hasActiveEvent) {
+            usersWithActiveEvents.push({ id: userId, ...userDoc.data() });
+        }
+    }
+
+    console.log("Usuarios con eventos activos:", usersWithActiveEvents);
+    return usersWithActiveEvents;
+  } catch (error) {
+      console.error("Error obteniendo usuarios con eventos activos:", error);
+      return [];
+  }
+};

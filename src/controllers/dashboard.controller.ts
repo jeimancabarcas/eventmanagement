@@ -4,6 +4,7 @@ import { getStats } from "../services/dashboard.service";
 export interface StatsDto {
     eventsRegistered: number,
     staffHired: number,
+    staffHiredWithActiveEvents: number,
     totalActiveEvents: number,
     totalClosedEvents: number,
     totalHotelExpensesForActiveEvents:number,
