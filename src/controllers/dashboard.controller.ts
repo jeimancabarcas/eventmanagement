@@ -8,6 +8,8 @@ export interface StatsDto {
     totalClosedEvents: number,
     totalHotelExpensesForActiveEvents:number,
     totalHotelExpensesForClosedEvents:number,
+    totalFlightExpensesForActiveEvents:number,
+    totalFlightExpensesForClosedEvents:number,
 }
 
 export const GetStats = async (req: Request, res: Response) => {
