@@ -114,7 +114,7 @@ export const updateEvent = async (eventUpdate: EventDto): Promise<EventDto | und
 
   const eventRef = db.collection("events").doc(eventUpdate.id);
   console.log(eventUpdate)
-  await eventRef.set({
+  await eventRef.update({
     name: eventUpdate.name,
     start_date: admin.firestore.Timestamp.fromDate(new Date(eventUpdate.start_date)),
     end_date: admin.firestore.Timestamp.fromDate(new Date(eventUpdate.end_date)),

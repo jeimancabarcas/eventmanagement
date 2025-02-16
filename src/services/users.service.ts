@@ -110,7 +110,7 @@ export const updateUser = async (updateUser: UserDto): Promise<UserDto | undefin
       position: updateUser.position,
       updatedAt: admin.firestore.FieldValue.serverTimestamp()
     };
-    await userRef.set(userDataDoc);
+    await userRef.update({...userDataDoc});
     await admin.auth().updateUser(updateUser.id, {
       email: updateUser.email,
       password: updateUser.password,
