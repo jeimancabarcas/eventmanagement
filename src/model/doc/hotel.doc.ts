@@ -1,5 +1,6 @@
 export interface HotelDoc {
   parentId?: string,
+  eventId: string,
   name: string;
   country: string;
   city: string;

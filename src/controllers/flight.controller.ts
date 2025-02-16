@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { FlightDto } from "../model/dto/flight.dto";
-import { createFlight, deleteFlight, deleteManyFlights, getAllFights, getByIdFlight, updateFlight } from "../services/fligh.service";
+import { createFlight, deleteFlight, deleteManyFlights, getAllFights, getByIdFlight, updateFlight } from "../services/flights.service";
 import { FlightDoc } from "src/model/doc/flight.doc";
 
 export const CreateFlight = async (req: Request, res: Response) => {

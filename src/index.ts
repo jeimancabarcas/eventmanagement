@@ -6,6 +6,7 @@ import { RoleRoutes } from "./routes/role.routes";
 import { MasterStaffRoutes } from "./routes/master.staff.routes";
 import { HotelRoutes } from "./routes/hotel.routes";
 import { FlightsRoutes } from "./routes/flights.routes";
+import { DashboardRoutes } from "./routes/dashboard.routes";
 const cors = require('cors');
 
 const app = express();
@@ -22,6 +23,7 @@ app.use(MasterStaffRoutes);
 app.use(RoleRoutes);
 app.use(HotelRoutes);
 app.use(FlightsRoutes);
+app.use(DashboardRoutes);
 
 
 app.listen(PORT, () => {

@@ -1,5 +1,6 @@
 import express, { Request, Response } from 'express';
 import { CreateEvent, GetAllEvents, UpdateEvent, DeleteEvent, GetByIdEvent, DeleteManyEvents, GetComingEvents } from '../controllers/event.controller';
+import { updateEvent } from 'src/services/event.service';
 
 export const EventRoutes = express.Router();
 

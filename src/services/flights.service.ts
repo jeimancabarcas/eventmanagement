@@ -29,7 +29,8 @@ export const getAllFights = async (): Promise<FlightDoc[]> => {
 }
 export const createFlight = async (flighDto: FlightDto): Promise<FlightDoc> => {
   const flightDoc: FlightDoc = {
-    parentId: flighDto.user?.id,
+    parentId: flighDto.user?.id as string,
+    eventId: flighDto.eventId,
     departure: flighDto.departure,
     destination: flighDto.destination,
     departureTime: admin.firestore.Timestamp.fromDate(new Date(flighDto.departureTime)),
@@ -79,7 +80,8 @@ export const updateFlight = async (flightUpdate: FlightDto): Promise<FlightDto> 
   const flightRef = db.collection('users').doc(flightUpdate.user?.id as string).collection('flights').doc(flightUpdate.id as string);
   const userRef = db.collection('users');
   const flightDoc: FlightDoc = {
-    parentId: flightUpdate.user?.id,
+    eventId: flightUpdate.eventId,
+    parentId: flightUpdate.user?.id as string,
     departure: flightUpdate.departure,
     destination: flightUpdate.destination,
     departureTime: admin.firestore.Timestamp.fromDate(new Date(flightUpdate.departureTime)),

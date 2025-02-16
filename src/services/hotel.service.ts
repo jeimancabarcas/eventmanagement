@@ -2,7 +2,6 @@ import { HotelDto } from "../model/dto/hotel.dto";
 import { db } from "../config/firebase";
 import { HotelDoc } from "src/model/doc/hotel.doc";
 import { UserDoc } from "src/model/doc/user.doc";
-import { UserDto } from "src/model/dto/user.dto";
 const admin = require("firebase-admin");
 
 
@@ -32,6 +31,7 @@ export const getAllHotels = async (): Promise<HotelDto[]> => {
 export const createHotel = async (hotelDto: HotelDto): Promise<HotelDoc> => {
   const hotelDoc: HotelDoc = {
       parentId: hotelDto.user?.id,
+      eventId: hotelDto.eventId,
       name: hotelDto.name,
       country: hotelDto.country,
       city: hotelDto.city,
@@ -79,6 +79,7 @@ export const updateHotel = async (hotelUpdate: HotelDto): Promise<HotelDto> => {
   const userRef = db.collection('users');
   const hotelDoc: HotelDoc = {
     name: hotelUpdate.name,
+    eventId: hotelUpdate.eventId,
     address: hotelUpdate.address,
     country: hotelUpdate.country,
     city: hotelUpdate.city,

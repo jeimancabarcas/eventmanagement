@@ -2,6 +2,7 @@ import { UserDto } from "./user.dto";
 
 export interface HotelDto {
     id?: string;
+    eventId:string;
     name: string;
     country: string;
     city: string;
