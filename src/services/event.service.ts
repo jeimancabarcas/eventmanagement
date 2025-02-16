@@ -4,6 +4,8 @@ import { EventDto, eventDtoFromFirestore, eventDtoToFirestore } from "../model/d
 import { StaffDto, staffDtoFromFirestore, staffDtoToFirestore } from "../model/dto/staff.dto";
 import { StaffDoc } from "src/model/doc/staff.doc";
 import { UserDto } from "src/model/dto/user.dto";
+import { FlightDto } from "src/model/dto/flight.dto";
+import { HotelDto } from "src/model/dto/hotel.dto";
 const admin = require("firebase-admin");
 
 
@@ -94,7 +96,20 @@ const getStaffsInformation = async (eventDocId: string): Promise<UserDto[]> => {
     for (const staffDoc of staffSnapshot.docs) {
       const userId = staffDoc.id; // ID del usuario en la subcolección "staff"
       const userDoc = await db.collection("users").doc(userId).get();
-
+      const flightDocs = await db.collection("users").doc(userId).collection("flights").get()
+      const listFlightsDto: FlightDto[] = [];
+      for(const flight of flightDocs.docs) {
+        listFlightsDto.push({
+          ...flight.data() as FlightDto
+        })
+      }
+      const hotelDocs = await db.collection("users").doc(userId).collection("hotels").get()
+      const listHotelsDto: HotelDto[] = [];
+      for(const hotel of hotelDocs.docs) {
+        listHotelsDto.push({
+          ...hotel.data() as HotelDto
+        })
+      }
       if (!userDoc.exists) {
         console.warn(`⚠️ Usuario con ID ${userId} no encontrado en "users".`);
         continue;
@@ -103,6 +118,8 @@ const getStaffsInformation = async (eventDocId: string): Promise<UserDto[]> => {
       // 🔥 Fusionar datos de "users" y "staff"
       staffs.push({
         id: userId,
+        flights: listFlightsDto,
+        hotels: listHotelsDto,
         ...userDoc.data(),  // Datos de la colección "users"
       } as UserDto);
     }
