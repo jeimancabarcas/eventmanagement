@@ -3,6 +3,8 @@ import { db } from "../config/firebase";
 import { HotelDoc } from "src/model/doc/hotel.doc";
 import { UserDoc } from "src/model/doc/user.doc";
 import { UserDto } from "src/model/dto/user.dto";
+const admin = require("firebase-admin");
+
 
 export const getAllHotels = async (): Promise<HotelDto[]> => {
   const hotelRefDocs = await db.collectionGroup("hotels").get();
@@ -36,8 +38,8 @@ export const createHotel = async (hotelDto: HotelDto): Promise<HotelDoc> => {
       address: hotelDto.address,
       bookingCode: hotelDto.bookingCode,
       room: hotelDto.room,
-      checkIn: hotelDto.checkIn,
-      checkOut: hotelDto.checkOut,
+      checkIn: admin.firestore.Timestamp.fromDate(hotelDto.checkIn),
+      checkOut: admin.firestore.Timestamp.fromDate(hotelDto.checkOut),
       cost: hotelDto.cost
   }
   const hotelRef = await db.collection('users').doc(hotelDto.user?.id as string).collection('hotels').add( hotelDoc );
@@ -82,8 +84,8 @@ export const updateHotel = async (hotelUpdate: HotelDto): Promise<HotelDto> => {
     city: hotelUpdate.city,
     room: hotelUpdate.room,
     bookingCode: hotelUpdate.bookingCode,
-    checkIn: hotelUpdate.checkIn,
-    checkOut: hotelUpdate.checkOut,
+    checkIn: admin.firestore.Timestamp.fromDate(hotelUpdate.checkIn),
+    checkOut: admin.firestore.Timestamp.fromDate(hotelUpdate.checkOut),
     cost: hotelUpdate.cost
   }
   await hotelRef.update({...hotelDoc});
