@@ -45,8 +45,8 @@ export const createEvent = async (eventDto: EventDto): Promise<EventDto> => {
   const eventDoc = {
     artist: eventDto.artist,
     name: eventDto.name,
-    start_date: admin.firestore.Timestamp.fromDate(eventDto.start_date),
-    end_date: admin.firestore.Timestamp.fromDate(eventDto.end_date),
+    start_date: admin.firestore.Timestamp.fromDate(new Date(eventDto.start_date)),
+    end_date: admin.firestore.Timestamp.fromDate(new Date(eventDto.end_date)),
     place: eventDto.place,
   };
 
