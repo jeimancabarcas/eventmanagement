@@ -34,7 +34,8 @@ export const createHotel = async (hotelDto: HotelDto): Promise<HotelDoc> => {
       bookingCode: hotelDto.bookingCode,
       room: hotelDto.room,
       checkIn: hotelDto.checkIn,
-      checkOut: hotelDto.checkOut
+      checkOut: hotelDto.checkOut,
+      cost: hotelDto.cost
   }
   const hotelRef = await db.collection('users').doc(hotelDto.user?.id as string).collection('hotels').add( hotelDoc );
   const userRef = db.collection('users');
@@ -80,6 +81,7 @@ export const updateHotel = async (hotelUpdate: HotelDto): Promise<HotelDto> => {
     bookingCode: hotelUpdate.bookingCode,
     checkIn: hotelUpdate.checkIn,
     checkOut: hotelUpdate.checkOut,
+    cost: hotelUpdate.cost
   }
   await hotelRef.update({...hotelDoc});
   const hotelDocumentUpdated = (await hotelRef.get()).data() as HotelDoc;

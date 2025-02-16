@@ -8,4 +8,5 @@ export interface HotelDoc {
   room: string;
   checkIn: Date;
   checkOut: Date;
+  cost: number;
 }

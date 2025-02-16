@@ -10,5 +10,6 @@ export interface HotelDto {
     room: string;
     checkIn: Date;
     checkOut: Date;
+    cost: number;
     user?: UserDto;
   }
