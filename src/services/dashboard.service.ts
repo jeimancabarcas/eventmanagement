@@ -96,6 +96,53 @@ const getFlightExpenses = async(): Promise<{expensesActiveEvents: number, expens
   }
 }
 
+export const getUsersWithoutActiveEvents = async (): Promise<UserDto[]> => {
+  try {
+    let usersWithoutActiveEvents: any[] = [];
+
+    // 1️⃣ Obtener eventos activos (endDate >= ahora)
+    const activeEventsSnapshot = await db.collection("events")
+        .where("end_date", ">=", admin.firestore.Timestamp.fromDate(new Date()))
+        .get();
+
+        // 2️⃣ Obtener los eventId de los eventos activos
+        const activeEventIds = activeEventsSnapshot.docs.map(doc => doc.id);
+        console.log("Eventos activos:", activeEventIds);
+
+        // 3️⃣ Obtener todos los usuarios
+        const usersSnapshot = await db.collection("users").get();
+
+        for (const userDoc of usersSnapshot.docs) {
+            const userId = userDoc.id;
+
+            // 4️⃣ Obtener la subcolección "events" de cada usuario
+            const userEventsSnapshot = await db.collection("users")
+                .doc(userId)
+                .collection("events")
+                .get();
+
+            if (userEventsSnapshot.empty) {
+                // 5️⃣ Si el usuario NO tiene eventos, lo agregamos directamente
+                usersWithoutActiveEvents.push({ id: userId, ...userDoc.data() });
+                continue;
+            }
+
+            // 6️⃣ Verificar si el usuario NO tiene eventos activos
+            const hasActiveEvent = userEventsSnapshot.docs.some(doc => activeEventIds.includes(doc.id));
+
+            if (!hasActiveEvent) {
+                usersWithoutActiveEvents.push({ id: userId, ...userDoc.data() });
+            }
+        }
+
+        console.log("Usuarios SIN eventos activos:", usersWithoutActiveEvents);
+        return usersWithoutActiveEvents;
+    } catch (error) {
+        console.error("Error obteniendo usuarios sin eventos activos:", error);
+        return [];
+    }
+};
+
 export const getUsersWithActiveEvents = async (): Promise<UserDto[]> => {
   try {
     let usersWithActiveEvents: any[] = [];
