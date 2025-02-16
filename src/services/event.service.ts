@@ -115,12 +115,11 @@ const getStaffsInformation = async (eventDocId: string): Promise<UserDto[]> => {
         continue;
       }
 
-      // 🔥 Fusionar datos de "users" y "staff"
       staffs.push({
         id: userId,
         flights: listFlightsDto,
         hotels: listHotelsDto,
-        ...userDoc.data(),  // Datos de la colección "users"
+        ...userDoc.data(),
       } as UserDto);
     }
   return staffs;
