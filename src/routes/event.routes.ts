@@ -7,7 +7,7 @@ export const EventRoutes = express.Router();
 const prefix = '/api/v1/events';
 EventRoutes.post(`${prefix}/create`, CreateEvent);
 EventRoutes.get(`${prefix}/getall`, GetAllEvents);
-EventRoutes.put(`${prefix}/update/:id`, UpdateEvent);
+EventRoutes.put(`${prefix}/update`, UpdateEvent);
 EventRoutes.get(`${prefix}/getById/:id`, GetByIdEvent);
 EventRoutes.delete(`${prefix}/delete/:id`, DeleteEvent);
 EventRoutes.delete(`${prefix}/deleteMany`, DeleteManyEvents);

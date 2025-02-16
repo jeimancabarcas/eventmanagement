@@ -1,5 +1,5 @@
 import express, { Request, Response } from 'express';
-import { GetAllUsers, CreateUser, GetById, AuthUser, UpdateUser, DeleteUser } from '../controllers/user.controller';
+import { GetAllUsers, CreateUser, GetById, AuthUser, UpdateUser, DeleteUser, DeleteManyUsers, GetByRole } from '../controllers/user.controller';
 import { db } from '../config/firebase';
 import { verifyToken } from "../middlewares/authorization";
 
@@ -23,7 +23,9 @@ UserRoutes.get("/roles", async (req: Request, res: Response) => {
 });
 
 UserRoutes.get(`${prefix}/getall`, GetAllUsers);
+UserRoutes.get(`${prefix}/getByRole/:role`, GetByRole);
 UserRoutes.post(`${prefix}/create`, CreateUser);
 UserRoutes.get(`${prefix}/get/:id`, GetById);
 UserRoutes.put(`${prefix}/update`, UpdateUser);
 UserRoutes.delete(`${prefix}/delete/:id`, DeleteUser);
+UserRoutes.delete(`${prefix}/deleteMany`, DeleteManyUsers);
