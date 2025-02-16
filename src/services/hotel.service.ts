@@ -38,8 +38,8 @@ export const createHotel = async (hotelDto: HotelDto): Promise<HotelDoc> => {
       address: hotelDto.address,
       bookingCode: hotelDto.bookingCode,
       room: hotelDto.room,
-      checkIn: admin.firestore.Timestamp.fromDate(hotelDto.checkIn),
-      checkOut: admin.firestore.Timestamp.fromDate(hotelDto.checkOut),
+      checkIn: admin.firestore.Timestamp.fromDate(new Date(hotelDto.checkIn)),
+      checkOut: admin.firestore.Timestamp.fromDate(new Date(hotelDto.checkOut)),
       cost: hotelDto.cost
   }
   const hotelRef = await db.collection('users').doc(hotelDto.user?.id as string).collection('hotels').add( hotelDoc );
@@ -84,8 +84,8 @@ export const updateHotel = async (hotelUpdate: HotelDto): Promise<HotelDto> => {
     city: hotelUpdate.city,
     room: hotelUpdate.room,
     bookingCode: hotelUpdate.bookingCode,
-    checkIn: admin.firestore.Timestamp.fromDate(hotelUpdate.checkIn),
-    checkOut: admin.firestore.Timestamp.fromDate(hotelUpdate.checkOut),
+    checkIn: admin.firestore.Timestamp.fromDate(new Date(hotelUpdate.checkIn)),
+    checkOut: admin.firestore.Timestamp.fromDate(new Date(hotelUpdate.checkOut)),
     cost: hotelUpdate.cost
   }
   await hotelRef.update({...hotelDoc});
