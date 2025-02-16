@@ -152,10 +152,9 @@ export const updateUser = async (updateUser: UserDto): Promise<UserDto | undefin
 }
 
 const getUsersInformation = async (userDocId: string): Promise<EventDto[]> => {
-  const events: EventDto[] = []
+    const events: EventDto[] = []
     // 🔹 Obtener el events del user
     const eventsSnapshot = await db.collection("users").doc(userDocId).collection("events").get();
-
     for (const doc of eventsSnapshot.docs) {
       const eventId = doc.id;
       const eventDoc = await db.collection("events").doc(eventId).get();
@@ -172,6 +171,7 @@ const getUsersInformation = async (userDocId: string): Promise<EventDto[]> => {
     }
   return events;
 }
+
 export const deleteUser = async (id: string): Promise<boolean> => {
     try {
       await admin.auth().getUser(id);
