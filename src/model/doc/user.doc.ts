@@ -1,6 +1,6 @@
 export interface UserDoc {
   name?: string,
-  email: string,
+  email?: string,
   password?: string,
   lastName?: string,
   role?: string,

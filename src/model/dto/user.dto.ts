@@ -3,7 +3,7 @@ import { EventDto } from "./event.dto"
 export interface UserDto {
   id?: string,
   name?: string,
-  email: string,
+  email?: string,
   password?: string,
   lastName?: string,
   role?: string,

@@ -16,9 +16,12 @@ export const getAllHotels = async (): Promise<HotelDto[]> => {
     const userData = userDocument.exists ? (userDocument.data() as UserDoc) : null;
     listHotel.push({
       id: hotel.id,
-      ...hotel.data() as HotelDto,
-      user: userData as UserDto,
-    })
+      ...hotel.data(),
+      user:{ 
+        id: parentId,
+        ...userData
+      },
+    } as HotelDto)
   }
 
   return listHotel;
