@@ -8,5 +8,5 @@ const prefix = '/api/v1/hotel';
 HotelRoutes.post(`${prefix}/create`, CreateHotel);
 HotelRoutes.get(`${prefix}/getall`, GetAllHotels);
 HotelRoutes.put(`${prefix}/update`, UpdateHotel);
-HotelRoutes.get(`${prefix}/getById/:id`, GetByIdHotel);
-HotelRoutes.delete(`${prefix}/delete/:id`, DeleteHotel);
+HotelRoutes.get(`${prefix}/getById/:userId/:hotelId`, GetByIdHotel);
+HotelRoutes.delete(`${prefix}/delete/:userId/:hotelId`, DeleteHotel);

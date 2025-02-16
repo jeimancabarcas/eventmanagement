@@ -14,10 +14,10 @@ export const CreateFlight = async (req: Request, res: Response) => {
     flightNumber
   };
   try {
-    const flightCreate = await createFlight({...flightDoc });
+    //const flightCreate = await createFlight({...flightDoc });
     res.status(200).json({
       "Message": "Evento Creado con éxito",
-      "Evento": flightCreate
+     // "Evento": flightCreate
     }
     );
   } catch (error: any) {

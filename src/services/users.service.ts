@@ -5,6 +5,7 @@ import * as jwt from 'jsonwebtoken';
 import "dotenv/config";
 import { UserDto } from "src/model/dto/user.dto";
 import { EventDto } from "src/model/dto/event.dto";
+import { UserDoc } from "src/model/doc/user.doc";
 const admin = require("firebase-admin");
 
 export const getAllUsers = async (): Promise<UserDto[]> => {
@@ -15,7 +16,7 @@ export const getAllUsers = async (): Promise<UserDto[]> => {
     const userData = userDoc.data() as UserDto;
     userData.id = userDoc.id;
     userData.events = [];
-    userData.events = await getUsersInformation(userDoc.id)
+    userData.events = await getEventsInformation(userDoc.id)
     
     users.push(userData);
   }
@@ -57,7 +58,7 @@ export const createUser = async (user: UserDto): Promise<UserDto> => {
     // 🔹 Obtener el evento actualizado
     const userDocCreated = (await userRef.get()).data() as UserDto;
     userDocCreated.events = [];
-    userDocCreated.events = await getUsersInformation(userRef.id);
+    userDocCreated.events = await getEventsInformation(userRef.id);
 
     return {
       id: userRef.id,
@@ -73,7 +74,7 @@ export const getById = async (id: string): Promise<UserDto> => {
   const userRef = await db.collection('users').doc(id);
   const userDocCreated = (await userRef.get()).data() as UserDto;
   userDocCreated.events = [];
-  userDocCreated.events = await getUsersInformation(userRef.id)
+  userDocCreated.events = await getEventsInformation(userRef.id)
   return {
     id: userRef.id,
     ...userDocCreated
@@ -100,25 +101,22 @@ export const updateUser = async (updateUser: UserDto): Promise<UserDto | undefin
     if (!snapshot.exists) {
       throw new Error(`Usuario con ID ${updateUser.id as string} no encontrado.`);
     }
-    const userData: UserDto= {
+    const userDataDoc: UserDoc= {
       name: updateUser.name,
       lastName: updateUser.lastName,
       email: updateUser.email,
       role: updateUser.role,
       address: updateUser.address,
-      position: updateUser.position
-    };
-    await userRef.update({
-      ...userData,
+      position: updateUser.position,
       updatedAt: admin.firestore.FieldValue.serverTimestamp()
-    });
+    };
+    await userRef.set(userDataDoc);
     await admin.auth().updateUser(updateUser.id, {
       email: updateUser.email,
       password: updateUser.password,
       displayName: updateUser.name,
     });
     
-    // 🔹 Eliminar todos los documentos en "events" si existen
     const eventsSnapshot = await userRef.collection("events").get();
     const batch = db.batch();
     eventsSnapshot.forEach((doc) => {
@@ -139,7 +137,7 @@ export const updateUser = async (updateUser: UserDto): Promise<UserDto | undefin
     // 🔹 Obtener el evento actualizado
     const userDocCreated = (await userRef.get()).data() as UserDto;
     userDocCreated.events = [];
-    userDocCreated.events = await getUsersInformation(userRef.id);
+    userDocCreated.events = await getEventsInformation(userRef.id);
 
     return {
       id: userRef.id,
@@ -151,7 +149,7 @@ export const updateUser = async (updateUser: UserDto): Promise<UserDto | undefin
   }
 }
 
-const getUsersInformation = async (userDocId: string): Promise<EventDto[]> => {
+const getEventsInformation = async (userDocId: string): Promise<EventDto[]> => {
     const events: EventDto[] = []
     // 🔹 Obtener el events del user
     const eventsSnapshot = await db.collection("users").doc(userDocId).collection("events").get();

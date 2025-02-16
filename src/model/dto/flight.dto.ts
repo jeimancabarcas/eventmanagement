@@ -1,5 +1,3 @@
-import { firestore } from "firebase-admin";
-
 export interface FlightDto {
   id?:string
   departure: string 
@@ -8,5 +6,6 @@ export interface FlightDto {
   arrivalTime: Date
   airline: string
   flightNumber: string
+  cost: number
 }
 

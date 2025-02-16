@@ -1,7 +1,11 @@
 export interface HotelDoc {
-    id?: string
-    name: string
-    country: string
-    city: string
-    address: string
-  }
+  parentId?: string,
+  name: string;
+  country: string;
+  city: string;
+  address: string;
+  bookingCode: string;
+  room: string;
+  checkIn: Date;
+  checkOut: Date;
+}
