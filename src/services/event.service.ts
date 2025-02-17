@@ -1,8 +1,6 @@
-import { EventDoc, eventDocFromFirestore, eventDocToFirestore } from "../model/doc/event.doc";
+import { EventDoc } from "../model/doc/event.doc";
 import { db } from "../config/firebase";
-import { EventDto, eventDtoFromFirestore, eventDtoToFirestore } from "../model/dto/event.dto";
-import { StaffDto, staffDtoFromFirestore, staffDtoToFirestore } from "../model/dto/staff.dto";
-import { StaffDoc } from "src/model/doc/staff.doc";
+import { EventDto } from "../model/dto/event.dto";
 import { UserDto } from "src/model/dto/user.dto";
 const admin = require("firebase-admin");
 
