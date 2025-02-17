@@ -110,7 +110,7 @@ export const getUsersWithoutActiveEvents = async (): Promise<UserDto[]> => {
         console.log("Eventos activos:", activeEventIds);
 
         // 3️⃣ Obtener todos los usuarios
-        const usersSnapshot = await db.collection("users").get();
+        const usersSnapshot = await db.collection("users").where('role', "==", 'STAFF').get();
 
         for (const userDoc of usersSnapshot.docs) {
             const userId = userDoc.id;
@@ -163,7 +163,7 @@ export const getUsersWithActiveEvents = async (): Promise<UserDto[]> => {
     console.log("Eventos activos:", activeEventIds);
 
     // 3️⃣ Obtener todos los usuarios
-    const usersSnapshot = await db.collection("users").get();
+    const usersSnapshot = await db.collection("users").where('role', "==", 'STAFF').get();
 
     for (const userDoc of usersSnapshot.docs) {
         const userId = userDoc.id;
