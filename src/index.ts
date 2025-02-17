@@ -1,9 +1,6 @@
 import express from "express";
 import { UserRoutes } from "./routes/users.routes";
 import { EventRoutes } from "./routes/event.routes";
-import { EventLogisticsRoutes } from "./routes/staff.routes";
-import { RoleRoutes } from "./routes/role.routes";
-import { MasterStaffRoutes } from "./routes/master.staff.routes";
 import { HotelRoutes } from "./routes/hotel.routes";
 import { FlightsRoutes } from "./routes/flights.routes";
 import { DashboardRoutes } from "./routes/dashboard.routes";
@@ -18,9 +15,6 @@ app.use(cors());
 
 app.use(UserRoutes);
 app.use(EventRoutes);
-app.use(EventLogisticsRoutes);
-app.use(MasterStaffRoutes);
-app.use(RoleRoutes);
 app.use(HotelRoutes);
 app.use(FlightsRoutes);
 app.use(DashboardRoutes);
