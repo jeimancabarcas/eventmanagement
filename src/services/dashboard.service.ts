@@ -2,6 +2,8 @@ import { UserDto } from "src/model/dto/user.dto";
 import { db } from "../config/firebase";
 import { EventDto} from "../model/dto/event.dto";
 import { StatsDto } from "src/controllers/dashboard.controller";
+import { FlightDto } from "src/model/dto/flight.dto";
+import { HotelDto } from "src/model/dto/hotel.dto";
 const admin = require("firebase-admin");
 
 
@@ -94,6 +96,65 @@ const getFlightExpenses = async(): Promise<{expensesActiveEvents: number, expens
     expensesActiveEvents: totalFlightExpensesForActiveEvents,
     expensesClosedEvents: totalFlightExpensesForClosedEvents
   }
+}
+
+export const getStaffDashboard = async(userId: string): Promise<{upcomingFlights: FlightDto[], upcomingHotels: HotelDto[], upcomingEvents: EventDto[]}> => {
+  const now = admin.firestore.Timestamp.fromDate(new Date());
+
+  // 1️⃣ Obtener los 5 vuelos más cercanos del usuario
+  const flightsSnapshot = await db.collection("users")
+      .doc(userId)
+      .collection("flights")
+      .where("departureTime", ">=", now)
+      .orderBy("departureTime")
+      .limit(5)
+      .get();
+  const upcomingFlights: FlightDto[] = flightsSnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+  } as FlightDto));
+
+  // 2️⃣ Obtener los 5 hoteles más cercanos del usuario
+  const hotelsSnapshot = await db.collection("users")
+      .doc(userId)
+      .collection("hotels")
+      .where("checkIn", ">=", now)
+      .orderBy("checkIn")
+      .limit(5)
+      .get();
+  const upcomingHotels: HotelDto[] = hotelsSnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+  } as HotelDto));
+
+  // 3️⃣ Obtener los eventos más cercanos sin usar índice en `events`
+  const userEventsSnapshot = await db.collection("users")
+      .doc(userId)
+      .collection("events")
+      .get();
+
+  if (userEventsSnapshot.empty) {
+      return { upcomingFlights, upcomingHotels, upcomingEvents: [] };
+  }
+
+  const eventIds = userEventsSnapshot.docs.map(doc => doc.id);
+  let upcomingEvents: EventDto[] = [];
+  console.log("eventIds", eventIds)
+  // 🔹 En lugar de usar `.where("id", "in", eventIds)`, hacemos consultas individuales
+  for (const eventId of eventIds) {
+      const eventDoc = await db.collection("events").doc(eventId).get();
+      if (eventDoc.exists) {
+          console.log("event exist")
+          const eventData = eventDoc.data() as EventDto;
+          if (eventData.start_date >= now) { // Verifica si aún no ha pasado
+              upcomingEvents.push({ id: eventId, ...eventData });
+          }
+      }
+      if (upcomingEvents.length >= 5) break; // 🔥 Optimización: Solo necesitamos 5 eventos
+  }
+
+  // 4️⃣ Retornar el resultado
+  return { upcomingFlights, upcomingHotels, upcomingEvents };
 }
 
 export const getUsersWithoutActiveEvents = async (): Promise<UserDto[]> => {
