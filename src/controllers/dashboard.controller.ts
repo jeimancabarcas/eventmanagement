@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 import { getStaffDashboard, getStats, getUsersWithoutActiveEvents } from "../services/dashboard.service";
+const admin = require("firebase-admin");
+
 
 export interface StatsDto {
     eventsRegistered: number,
@@ -33,8 +35,18 @@ export const GetUsersWithoutActiveEvents = async (req: Request, res: Response) =
 
 export const GetStaffDashboard = async (req: Request, res: Response) => {
   try {
-    const userId = "X3m6CfG3sOaNFKXESS0YSRtdnQ53";
-    const response = await getStaffDashboard(userId);
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      res.status(401).json({ message: 'Unauthorized: Missing or invalid token' });
+    }
+
+    const token = authHeader?.split(' ')[1]; // Extrae el token eliminando "Bearer "
+
+    // 🔹 Verificar y decodificar el token con Firebase Admin
+    const decodedToken = await admin.auth().verifyIdToken(token);
+    const uid = decodedToken.uid; // 🔥 Aquí obtenemos el UID del usuario autenticado
+
+    const response = await getStaffDashboard(uid);
     res.status(200).json(response);
   } catch (error: any) {
     res.status(500).send(error.message);

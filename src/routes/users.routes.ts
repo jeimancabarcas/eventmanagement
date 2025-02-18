@@ -8,9 +8,6 @@ export const UserRoutes = express.Router();
 const prefix = '/api/v1/users';
 UserRoutes.post(`${prefix}/auth`, AuthUser);
 
-UserRoutes.get("/perfil", verifyToken, (req: Request, res: Response) => {
-  res.json({ mensaje: "Acceso autorizado", usuario: req.user });
-});
 
 UserRoutes.get("/roles", async (req: Request, res: Response) => {
   try {
