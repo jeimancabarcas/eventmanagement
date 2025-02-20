@@ -5,8 +5,8 @@ import { verifyToken } from '../middlewares/authorization'
 export const DashboardRoutes = express.Router();
 
 const prefix = '/api/v1/dashboard';
-DashboardRoutes.get(`${prefix}/stats`, GetStats);
-DashboardRoutes.get(`${prefix}/usersWithoutActiveEvents`, GetUsersWithoutActiveEvents);
+DashboardRoutes.get(`${prefix}/stats`,verifyToken, GetStats);
+DashboardRoutes.get(`${prefix}/usersWithoutActiveEvents`,verifyToken, GetUsersWithoutActiveEvents);
 
 DashboardRoutes.get(`${prefix}/staffDashboard`, verifyToken, GetStaffDashboard);
 
