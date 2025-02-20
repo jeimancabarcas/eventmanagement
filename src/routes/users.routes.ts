@@ -9,16 +9,6 @@ const prefix = '/api/v1/users';
 UserRoutes.post(`${prefix}/auth`, AuthUser);
 
 
-UserRoutes.get("/roles", async (req: Request, res: Response) => {
-  try {
-    const findRoles = (await db.collection('roles').get());
-    const roles = findRoles.docs.map(rol => ({ id: rol.id, ...rol.data() }));
-    res.status(200).json(roles);
-  } catch (error: any) {
-    res.status(500).send(error.message);
-  }
-});
-
 UserRoutes.get(`${prefix}/getall`, verifyToken, checkRole(["ADMIN"]), GetAllUsers);
 UserRoutes.get(`${prefix}/getByRole/:role`, verifyToken, checkRole(["ADMIN"]), GetByRole);
 UserRoutes.post(`${prefix}/create`, verifyToken, checkRole(["ADMIN"]), CreateUser);

@@ -25,7 +25,7 @@ export const getAllEvents = async (): Promise<EventDto[]> => {
 
 export const getComingEvents = async (): Promise<EventDto[]> => {
   const eventsSnapshot = await db.collection("events")
-    .where("start_date", ">=", admin.firestore.Timestamp.fromDate(new Date()))
+    .where("start_date", ">=", admin.firestore?.Timestamp?.fromDate(new Date()))
     .get();
   const events: EventDto[] = [];
 
@@ -45,8 +45,8 @@ export const createEvent = async (eventDto: EventDto): Promise<EventDto> => {
   const eventDoc = {
     artist: eventDto.artist,
     name: eventDto.name,
-    start_date: admin.firestore.Timestamp.fromDate(new Date(eventDto.start_date)),
-    end_date: admin.firestore.Timestamp.fromDate(new Date(eventDto.end_date)),
+    start_date: admin.firestore?.Timestamp?.fromDate(new Date(eventDto.start_date)),
+    end_date: admin.firestore?.Timestamp?.fromDate(new Date(eventDto.end_date)),
     place: eventDto.place,
   };
 
@@ -130,8 +130,8 @@ export const updateEvent = async (eventUpdate: EventDto): Promise<EventDto | und
   console.log(eventUpdate)
   await eventRef.update({
     name: eventUpdate.name,
-    start_date: admin.firestore.Timestamp.fromDate(new Date(eventUpdate.start_date)),
-    end_date: admin.firestore.Timestamp.fromDate(new Date(eventUpdate.end_date)),
+    start_date: admin.firestore?.Timestamp?.fromDate(new Date(eventUpdate.start_date)),
+    end_date: admin.firestore?.Timestamp?.fromDate(new Date(eventUpdate.end_date)),
     artist: eventUpdate.artist,
     place: eventUpdate.place
   });
@@ -200,6 +200,6 @@ const deleteSubcollection = async (parentRef: FirebaseFirestore.DocumentReferenc
   if (snapshot.empty) return; // No hay documentos, no es necesario eliminar
 
   const batch = db.batch();
-  snapshot.forEach((doc) => batch.delete(doc.ref));
+  snapshot?.forEach((doc) => batch.delete(doc.ref));
   await batch.commit();
 };

@@ -15,8 +15,8 @@ export const getStats = async (): Promise<StatsDto> => {
   const statsDto: StatsDto = {} as StatsDto;
   statsDto.staffHired = (await userStaffRef.get()).docs.length;
   statsDto.eventsRegistered = (await eventsRef.get()).docs.length;
-  statsDto.totalActiveEvents = (await eventsRef.where("end_date", ">=", admin.firestore.Timestamp.fromDate(new Date())).get()).docs.length;
-  statsDto.totalClosedEvents = (await eventsRef.where("end_date", "<", admin.firestore.Timestamp.fromDate(new Date())).get()).docs.length;
+  statsDto.totalActiveEvents = (await eventsRef.where("end_date", ">=", admin.firestore?.Timestamp?.fromDate(new Date())).get()).docs.length;
+  statsDto.totalClosedEvents = (await eventsRef.where("end_date", "<", admin.firestore?.Timestamp?.fromDate(new Date())).get()).docs.length;
   const hotelExpenses = await getHotelExpenses();
   statsDto.totalHotelExpensesForActiveEvents = hotelExpenses.expensesActiveEvents;
   statsDto.totalHotelExpensesForClosedEvents = hotelExpenses.expensesClosedEvents;
@@ -29,8 +29,8 @@ export const getStats = async (): Promise<StatsDto> => {
 };
 
 const getHotelExpenses = async(): Promise<{expensesActiveEvents: number, expensesClosedEvents: number}> => {
-  const activeEventsSnapshot = await db.collection("events").where("end_date", ">=", admin.firestore.Timestamp.fromDate(new Date())).get();
-  const inactiveEventsSnapshot = await db.collection("events").where("end_date", "<", admin.firestore.Timestamp.fromDate(new Date())).get();
+  const activeEventsSnapshot = await db.collection("events").where("end_date", ">=", admin.firestore?.Timestamp?.fromDate(new Date())).get();
+  const inactiveEventsSnapshot = await db.collection("events").where("end_date", "<", admin.firestore?.Timestamp?.fromDate(new Date())).get();
 
   const inactiveEventIds = inactiveEventsSnapshot.docs.map(doc => doc.id);
   const activeEventIds = activeEventsSnapshot.docs.map(doc => doc.id);
@@ -64,8 +64,8 @@ const getHotelExpenses = async(): Promise<{expensesActiveEvents: number, expense
 }
 
 const getFlightExpenses = async(): Promise<{expensesActiveEvents: number, expensesClosedEvents: number}> => {
-  const activeEventsSnapshot = await db.collection("events").where("end_date", ">=", admin.firestore.Timestamp.fromDate(new Date())).get();
-  const inactiveEventsSnapshot = await db.collection("events").where("end_date", "<", admin.firestore.Timestamp.fromDate(new Date())).get();
+  const activeEventsSnapshot = await db.collection("events").where("end_date", ">=", admin.firestore?.Timestamp?.fromDate(new Date())).get();
+  const inactiveEventsSnapshot = await db.collection("events").where("end_date", "<", admin.firestore?.Timestamp?.fromDate(new Date())).get();
 
   const inactiveEventIds = inactiveEventsSnapshot.docs.map(doc => doc.id);
   const activeEventIds = activeEventsSnapshot.docs.map(doc => doc.id);
@@ -99,7 +99,7 @@ const getFlightExpenses = async(): Promise<{expensesActiveEvents: number, expens
 }
 
 export const getStaffDashboard = async(userId: string): Promise<{upcomingFlights: FlightDto[], upcomingHotels: HotelDto[], upcomingEvents: EventDto[]}> => {
-  const now = admin.firestore.Timestamp.fromDate(new Date());
+  const now = admin.firestore?.Timestamp?.fromDate(new Date());
 
   // 1️⃣ Obtener los 5 vuelos más cercanos del usuario
   const flightsSnapshot = await db.collection("users")
@@ -139,12 +139,10 @@ export const getStaffDashboard = async(userId: string): Promise<{upcomingFlights
 
   const eventIds = userEventsSnapshot.docs.map(doc => doc.id);
   let upcomingEvents: EventDto[] = [];
-  console.log("eventIds", eventIds)
   // 🔹 En lugar de usar `.where("id", "in", eventIds)`, hacemos consultas individuales
   for (const eventId of eventIds) {
       const eventDoc = await db.collection("events").doc(eventId).get();
       if (eventDoc.exists) {
-          console.log("event exist")
           const eventData = eventDoc.data() as EventDto;
           if (eventData.start_date >= now) { // Verifica si aún no ha pasado
               upcomingEvents.push({ id: eventId, ...eventData });
@@ -163,12 +161,11 @@ export const getUsersWithoutActiveEvents = async (): Promise<UserDto[]> => {
 
     // 1️⃣ Obtener eventos activos (endDate >= ahora)
     const activeEventsSnapshot = await db.collection("events")
-        .where("end_date", ">=", admin.firestore.Timestamp.fromDate(new Date()))
+        .where("end_date", ">=", admin.firestore?.Timestamp?.fromDate(new Date()))
         .get();
 
         // 2️⃣ Obtener los eventId de los eventos activos
         const activeEventIds = activeEventsSnapshot.docs.map(doc => doc.id);
-        console.log("Eventos activos:", activeEventIds);
 
         // 3️⃣ Obtener todos los usuarios
         const usersSnapshot = await db.collection("users").where('role', "==", 'STAFF').get();
@@ -196,7 +193,6 @@ export const getUsersWithoutActiveEvents = async (): Promise<UserDto[]> => {
             }
         }
 
-        console.log("Usuarios SIN eventos activos:", usersWithoutActiveEvents);
         return usersWithoutActiveEvents;
     } catch (error) {
         console.error("Error obteniendo usuarios sin eventos activos:", error);
@@ -210,18 +206,15 @@ export const getUsersWithActiveEvents = async (): Promise<UserDto[]> => {
 
     // 1️⃣ Obtener eventos activos (endDate >= ahora)
     const activeEventsSnapshot = await db.collection("events")
-        .where("end_date", ">=", admin.firestore.Timestamp.fromDate(new Date()))
+        .where("end_date", ">=", admin.firestore?.Timestamp?.fromDate(new Date()))
         .get();
 
     if (activeEventsSnapshot.empty) {
-        console.log("No hay eventos activos.");
         return [];
     }
 
     // 2️⃣ Obtener los eventId de los eventos activos
     const activeEventIds = activeEventsSnapshot.docs.map(doc => doc.id);
-
-    console.log("Eventos activos:", activeEventIds);
 
     // 3️⃣ Obtener todos los usuarios
     const usersSnapshot = await db.collection("users").where('role', "==", 'STAFF').get();
@@ -245,7 +238,6 @@ export const getUsersWithActiveEvents = async (): Promise<UserDto[]> => {
         }
     }
 
-    console.log("Usuarios con eventos activos:", usersWithActiveEvents);
     return usersWithActiveEvents;
   } catch (error) {
       console.error("Error obteniendo usuarios con eventos activos:", error);

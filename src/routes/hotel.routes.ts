@@ -9,5 +9,5 @@ const prefix = '/api/v1/hotel';
 HotelRoutes.post(`${prefix}/create`, verifyToken, checkRole(["ADMIN"]), CreateHotel);
 HotelRoutes.get(`${prefix}/getall`, verifyToken, checkRole(["ADMIN"]), GetAllHotels);
 HotelRoutes.put(`${prefix}/update`, verifyToken, checkRole(["ADMIN"]), UpdateHotel);
-HotelRoutes.get(`${prefix}/getById/:userId/:hotelId`, checkRole(["ADMIN"]), verifyToken, GetByIdHotel);
-HotelRoutes.delete(`${prefix}/delete/:userId/:hotelId`, checkRole(["ADMIN"]), verifyToken, DeleteHotel);
+HotelRoutes.get(`${prefix}/getById/:userId/:hotelId`,verifyToken, checkRole(["ADMIN"]), verifyToken, GetByIdHotel);
+HotelRoutes.delete(`${prefix}/delete/:userId/:hotelId`,verifyToken, checkRole(["ADMIN"]), DeleteHotel);
