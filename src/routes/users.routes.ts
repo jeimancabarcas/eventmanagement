@@ -19,10 +19,10 @@ UserRoutes.get("/roles", async (req: Request, res: Response) => {
   }
 });
 
-UserRoutes.get(`${prefix}/getall`, GetAllUsers);
-UserRoutes.get(`${prefix}/getByRole/:role`, GetByRole);
-UserRoutes.post(`${prefix}/create`, CreateUser);
-UserRoutes.get(`${prefix}/get/:id`, GetById);
-UserRoutes.put(`${prefix}/update`, UpdateUser);
-UserRoutes.delete(`${prefix}/delete/:id`, DeleteUser);
-UserRoutes.delete(`${prefix}/deleteMany`, DeleteManyUsers);
+UserRoutes.get(`${prefix}/getall`, verifyToken, GetAllUsers);
+UserRoutes.get(`${prefix}/getByRole/:role`, verifyToken, GetByRole);
+UserRoutes.post(`${prefix}/create`, verifyToken, CreateUser);
+UserRoutes.get(`${prefix}/get/:id`, verifyToken, GetById);
+UserRoutes.put(`${prefix}/update`, verifyToken, UpdateUser);
+UserRoutes.delete(`${prefix}/delete/:id`, verifyToken, DeleteUser);
+UserRoutes.delete(`${prefix}/deleteMany`, verifyToken, DeleteManyUsers);
