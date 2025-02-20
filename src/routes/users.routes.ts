@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express';
 import { GetAllUsers, CreateUser, GetById, AuthUser, UpdateUser, DeleteUser, DeleteManyUsers, GetByRole } from '../controllers/user.controller';
 import { db } from '../config/firebase';
-import { verifyToken } from "../middlewares/authorization";
+import { checkRole, verifyToken } from "../middlewares/authorization";
 
 export const UserRoutes = express.Router();
 
@@ -19,10 +19,10 @@ UserRoutes.get("/roles", async (req: Request, res: Response) => {
   }
 });
 
-UserRoutes.get(`${prefix}/getall`, verifyToken, GetAllUsers);
-UserRoutes.get(`${prefix}/getByRole/:role`, verifyToken, GetByRole);
-UserRoutes.post(`${prefix}/create`, verifyToken, CreateUser);
-UserRoutes.get(`${prefix}/get/:id`, verifyToken, GetById);
-UserRoutes.put(`${prefix}/update`, verifyToken, UpdateUser);
-UserRoutes.delete(`${prefix}/delete/:id`, verifyToken, DeleteUser);
-UserRoutes.delete(`${prefix}/deleteMany`, verifyToken, DeleteManyUsers);
+UserRoutes.get(`${prefix}/getall`, verifyToken, checkRole(["ADMIN"]), GetAllUsers);
+UserRoutes.get(`${prefix}/getByRole/:role`, verifyToken, checkRole(["ADMIN"]), GetByRole);
+UserRoutes.post(`${prefix}/create`, verifyToken, checkRole(["ADMIN"]), CreateUser);
+UserRoutes.get(`${prefix}/get/:id`, verifyToken, checkRole(["ADMIN"]), GetById);
+UserRoutes.put(`${prefix}/update`, verifyToken, checkRole(["ADMIN"]), UpdateUser);
+UserRoutes.delete(`${prefix}/delete/:id`, verifyToken, checkRole(["ADMIN"]), DeleteUser);
+UserRoutes.delete(`${prefix}/deleteMany`, verifyToken, checkRole(["ADMIN"]), DeleteManyUsers);
