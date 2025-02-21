@@ -14,7 +14,7 @@ export const getAllFights = async (): Promise<FlightDoc[]> => {
     const parentId = flight.data().parentId as string;
     if(!parentId) continue;
     const userDocument = await userRef.doc(parentId).get();
-    const userData = userDocument.exists ? (userDocument.data() as UserDoc) : null;
+    const userData = userDocument?.exists ? (userDocument.data() as UserDoc) : null;
     listFlights.push({
       id: flight.id,
       ...flight.data(),
@@ -43,15 +43,15 @@ export const createFlight = async (flighDto: FlightDto): Promise<FlightDoc> => {
   const userRef = db.collection('users');
 
   await flighRef.update({ id: flighRef.id });
-  const flightDocumentCreated = (await flighRef.get()).data() as FlightDoc;
-  const userDocument = (await userRef.doc(flightDocumentCreated.parentId as string).get()).data() as FlightDoc
+  const flightDocumentCreated = (await flighRef.get())?.data() as FlightDoc;
+  const userDocument = (await userRef.doc(flightDocumentCreated?.parentId as string).get())?.data() as FlightDoc
 
 
   const response: FlightDto = {
     id: flighRef.id,
     ...flightDocumentCreated as FlightDto,
     user: { 
-      id: flightDocumentCreated.parentId,
+      id: flightDocumentCreated?.parentId,
       ...userDocument 
     }
   }
@@ -84,15 +84,15 @@ export const updateFlight = async (flightUpdate: FlightDto): Promise<FlightDto> 
     parentId: flightUpdate.user?.id as string,
     departure: flightUpdate.departure,
     destination: flightUpdate.destination,
-    departureTime: admin.firestore.Timestamp.fromDate(new Date(flightUpdate.departureTime)),
-    arrivalTime: admin.firestore.Timestamp.fromDate(new Date(flightUpdate.arrivalTime)),
+    departureTime: admin?.firestore?.Timestamp?.fromDate(new Date(flightUpdate.departureTime)),
+    arrivalTime: admin?.firestore?.Timestamp?.fromDate(new Date(flightUpdate.arrivalTime)),
     airline: flightUpdate.airline,
     flightNumber: flightUpdate.flightNumber,
     cost: flightUpdate.cost
   }
   await flightRef.update({...flightDoc});
-  const flightDocumentUpdated = (await flightRef.get()).data() as FlightDoc;
-  const userDocument = (await userRef.doc(flightDocumentUpdated.parentId as string).get()).data() as UserDoc
+  const flightDocumentUpdated = (await flightRef.get())?.data() as FlightDoc;
+  const userDocument = (await userRef.doc(flightDocumentUpdated?.parentId as string).get())?.data() as UserDoc
 
   const response: FlightDto = {
     id: flightRef.id,
@@ -123,7 +123,6 @@ export const deleteManyFlights = async (ids: string[]): Promise<boolean> => {
     await batch.commit(); // Ejecuta la eliminación en batch
     return true;
   } catch (error) {
-    console.error("Error to delete hotels:", error);
     throw error;
   }
 }

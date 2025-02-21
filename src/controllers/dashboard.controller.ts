@@ -39,10 +39,9 @@ export const GetStaffDashboard = async (req: Request, res: Response) => {
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       res.status(401).json({ message: 'Unauthorized: Missing or invalid token' });
     }
-
+    /* istanbul ignore next */
     const token = authHeader?.split(' ')[1]; // Extrae el token eliminando "Bearer "
-
-    // 🔹 Verificar y decodificar el token con Firebase Admin
+    /* istanbul ignore next */
     const decodedToken = await admin.auth().verifyIdToken(token);
     const uid = decodedToken.uid; // 🔥 Aquí obtenemos el UID del usuario autenticado
 

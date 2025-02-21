@@ -58,7 +58,6 @@ describe("User Controller", () => {
     mockUsers = [mockUser];
 
     // ✅ Configurar mocks para los servicios
-    (userService.authUser as jest.Mock).mockResolvedValue({ token: "mocked-token" });
     (userService.createUser as jest.Mock).mockResolvedValue(mockUser);
     (userService.getAllUsers as jest.Mock).mockResolvedValue(mockUsers);
     (userService.getById as jest.Mock).mockResolvedValue(mockUser);
@@ -72,23 +71,11 @@ describe("User Controller", () => {
     jest.clearAllMocks(); // Restaurar los mocks después de cada prueba
   });
 
-  test("POST /users/auth - debería autenticar un usuario", async () => {
-    const response = await request(app)
-      .post("/api/v1/users/auth")
-      .send({ name: "John Doe", password: "securepassword" });
-
-     //console.log("Response Body:", response.body); // ✅ Depuración si falla
-
-    expect(response.status).toBe(200);
-    expect(response.body).toEqual({ token: "mocked-token" });
-  });
-
   test("GET /users/getall - debería devolver todos los usuarios", async () => {
     const response = await request(app)
       .get("/api/v1/users/getall")
       .set("Authorization", "Bearer valid-token");
 
-     //console.log("Response Body:", response.body);
 
     expect(response.status).toBe(200);
     expect(response.body.length).toBe(mockUsers.length);
@@ -100,7 +87,6 @@ describe("User Controller", () => {
       .get(`/api/v1/users/getByRole/ADMIN`)
       .set("Authorization", "Bearer valid-token");
 
-     //console.log("Response Body:", response.body);
 
     expect(response.status).toBe(200);
     expect(response.body.length).toBe(mockUsers.length);
@@ -112,7 +98,6 @@ describe("User Controller", () => {
       .send(mockUser)
       .set("Authorization", "Bearer valid-token");
 
-     //console.log("Response Body:", response.body);
 
     expect(response.status).toBe(200);
     expect(response.body.User).toEqual(mockUser);
@@ -123,7 +108,6 @@ describe("User Controller", () => {
       .get(`/api/v1/users/get/${mockUser.id}`)
       .set("Authorization", "Bearer valid-token");
 
-     //console.log("Response Body:", response.body);
 
     expect(response.status).toBe(200);
     expect(response.body["User finded"]).toEqual(mockUser);
@@ -138,7 +122,6 @@ describe("User Controller", () => {
       .send(updatedUser)
       .set("Authorization", "Bearer valid-token");
 
-     //console.log("Response Body:", response.body);
 
     expect(response.status).toBe(200);
     expect(response.body["User"].name).toBe("Updated Name");
@@ -149,7 +132,6 @@ describe("User Controller", () => {
       .delete(`/api/v1/users/delete/${mockUser.id}`)
       .set("Authorization", "Bearer valid-token");
 
-     //console.log("Response Body:", response.body);
 
     expect(response.status).toBe(200);
     expect(response.body.message).toBe("User deleted");
@@ -161,23 +143,9 @@ describe("User Controller", () => {
       .send({ ids: [mockUser.id] })
       .set("Authorization", "Bearer valid-token");
 
-     //console.log("Response Body:", response.body);
 
     expect(response.status).toBe(200);
     expect(response.body.message).toBe("Users deleted");
-  });
-
-  // ✅ Pruebas de error
-  test("POST /users/auth - debería devolver error 500 si hay un fallo en autenticación", async () => {
-    (userService.authUser as jest.Mock).mockRejectedValue(new Error("Authentication failed"));
-
-    const response = await request(app)
-      .post("/api/v1/users/auth")
-      .send({ name: "John Doe", password: "wrongpassword" });
-
-     //console.log("Response Body:", response.body);
-
-    expect(response.status).toBe(500);
   });
 
   test("GET /users/get/:id - debería devolver error 500 si el usuario no existe", async () => {
@@ -187,7 +155,6 @@ describe("User Controller", () => {
       .get(`/api/v1/users/get/${mockUser.id}`)
       .set("Authorization", "Bearer valid-token");
 
-     //console.log("Response Body:", response.body);
 
     expect(response.status).toBe(500);
   });

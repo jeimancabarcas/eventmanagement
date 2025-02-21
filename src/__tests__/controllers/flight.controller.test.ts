@@ -80,7 +80,6 @@ describe("Flight Controller", () => {
       .send(mockFlight)
       .set("Authorization", "Bearer valid-token");
 
-     //console.log("Response Body:", response.body); // ✅ Depuración si falla
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual(mockFlight);
@@ -91,7 +90,6 @@ describe("Flight Controller", () => {
       .get("/api/v1/flights/getall")
       .set("Authorization", "Bearer valid-token");
 
-     //console.log("Response Body:", response.body);
 
     expect(response.status).toBe(200);
     expect(response.body.length).toBe(mockFlights.length);
@@ -103,7 +101,6 @@ describe("Flight Controller", () => {
       .get(`/api/v1/flights/getById/testUser/${mockFlight.id}`)
       .set("Authorization", "Bearer valid-token");
 
-     //console.log("Response Body:", response.body);
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual(mockFlight);
@@ -118,7 +115,6 @@ describe("Flight Controller", () => {
       .send(updatedFlight)
       .set("Authorization", "Bearer valid-token");
 
-     //console.log("Response Body:", response.body);
 
     expect(response.status).toBe(200);
     expect(response.body.airline).toBe("American Airlines");
@@ -129,7 +125,6 @@ describe("Flight Controller", () => {
       .delete(`/api/v1/flights/delete/testUser/${mockFlight.id}`)
       .set("Authorization", "Bearer valid-token");
 
-     //console.log("Response Body:", response.body);
 
     expect(response.status).toBe(200);
     expect(response.body.message).toBe("Flight deleted");
@@ -144,7 +139,6 @@ describe("Flight Controller", () => {
       .send(mockFlight)
       .set("Authorization", "Bearer valid-token");
 
-     //console.log("Response Body:", response.body);
 
     expect(response.status).toBe(500);
   });
@@ -156,7 +150,6 @@ describe("Flight Controller", () => {
       .get(`/api/v1/flights/getById/testUser/${mockFlight.id}`)
       .set("Authorization", "Bearer valid-token");
 
-     //console.log("Response Body:", response.body);
 
     expect(response.status).toBe(500);
   });

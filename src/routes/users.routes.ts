@@ -1,12 +1,11 @@
 import express, { Request, Response } from 'express';
-import { GetAllUsers, CreateUser, GetById, AuthUser, UpdateUser, DeleteUser, DeleteManyUsers, GetByRole } from '../controllers/user.controller';
+import { GetAllUsers, CreateUser, GetById, UpdateUser, DeleteUser, DeleteManyUsers, GetByRole } from '../controllers/user.controller';
 import { db } from '../config/firebase';
 import { checkRole, verifyToken } from "../middlewares/authorization";
 
 export const UserRoutes = express.Router();
 
 const prefix = '/api/v1/users';
-UserRoutes.post(`${prefix}/auth`, AuthUser);
 
 
 UserRoutes.get(`${prefix}/getall`, verifyToken, checkRole(["ADMIN"]), GetAllUsers);

@@ -1,23 +1,8 @@
 import { DtoToken } from "../model/doc/token";
-import { getAllUsers, createUser, getById, authUser, updateUser, deleteUser, deleteManyUsers, getByRole } from "../services/users.service";
+import { getAllUsers, createUser, getById, updateUser, deleteUser, deleteManyUsers, getByRole } from "../services/users.service";
 import { Request, Response } from "express";
 import CryptoJS from "crypto-js";
 import "dotenv/config";
-
-export const AuthUser = async (req: Request, res: Response) => {
-  const { name, password } = req.body;
-  const dtoToken: DtoToken = {
-    password,
-    name
-  }
-
-  try {
-    const token = await authUser(dtoToken);
-    res.status(200).json(token);
-  } catch (error: any) {
-    res.status(500).send(error.message);
-  }
-}
 
 export const GetAllUsers = async (req: Request, res: Response) => {
   try {

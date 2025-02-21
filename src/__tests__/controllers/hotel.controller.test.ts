@@ -80,7 +80,6 @@ describe("Hotel Controller", () => {
       .send(mockHotel)
       .set("Authorization", "Bearer valid-token");
 
-     //console.log("Response Body:", response.body); // ✅ Depuración si falla
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual(mockHotel);
@@ -91,7 +90,6 @@ describe("Hotel Controller", () => {
       .get("/api/v1/hotel/getall")
       .set("Authorization", "Bearer valid-token");
 
-     //console.log("Response Body:", response.body);
 
     expect(response.status).toBe(200);
     expect(response.body.length).toBe(mockHotels.length);
@@ -103,7 +101,6 @@ describe("Hotel Controller", () => {
       .get(`/api/v1/hotel/getById/testUser/${mockHotel.id}`)
       .set("Authorization", "Bearer valid-token");
 
-     //console.log("Response Body:", response.body);
 
     expect(response.status).toBe(200);
     expect(response.body["Hotel finded"]).toEqual(mockHotel);
@@ -118,7 +115,6 @@ describe("Hotel Controller", () => {
       .send(updatedHotel)
       .set("Authorization", "Bearer valid-token");
 
-     //console.log("Response Body:", response.body);
 
     expect(response.status).toBe(200);
     expect(response.body["Event"].name).toBe("Updated Hotel");
@@ -129,7 +125,6 @@ describe("Hotel Controller", () => {
       .delete(`/api/v1/hotel/delete/testUser/${mockHotel.id}`)
       .set("Authorization", "Bearer valid-token");
 
-     //console.log("Response Body:", response.body);
 
     expect(response.status).toBe(200);
     expect(response.body.message).toBe("Hotel deleted");
@@ -144,7 +139,6 @@ describe("Hotel Controller", () => {
       .send(mockHotel)
       .set("Authorization", "Bearer valid-token");
 
-     //console.log("Response Body:", response.body);
 
     expect(response.status).toBe(500);
   });
@@ -156,7 +150,6 @@ describe("Hotel Controller", () => {
       .get(`/api/v1/hotel/getById/testUser/${mockHotel.id}`)
       .set("Authorization", "Bearer valid-token");
 
-     //console.log("Response Body:", response.body);
 
     expect(response.status).toBe(500);
   });

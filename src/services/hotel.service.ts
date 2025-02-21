@@ -14,7 +14,7 @@ export const getAllHotels = async (): Promise<HotelDto[]> => {
     const parentId = hotel.data().parentId as string;
     if(!parentId) continue;
     const userDocument = await userRef.doc(parentId).get();
-    const userData = userDocument.exists ? (userDocument.data() as UserDoc) : null;
+    const userData = userDocument?.exists ? (userDocument?.data() as UserDoc) : null;
     listHotel.push({
       id: hotel.id,
       ...hotel.data(),
@@ -46,8 +46,8 @@ export const createHotel = async (hotelDto: HotelDto): Promise<HotelDoc> => {
   const userRef = db.collection('users');
 
   await hotelRef.update({ id: hotelRef.id });
-  const hotelDocumentCreated = (await hotelRef.get()).data() as HotelDoc;
-  const userDocument = (await userRef.doc(hotelDocumentCreated.parentId as string).get()).data() as UserDoc
+  const hotelDocumentCreated = (await hotelRef.get())?.data() as HotelDoc;
+  const userDocument = (await userRef.doc(hotelDocumentCreated?.parentId as string).get())?.data() as UserDoc
 
   const response: HotelDto = {
     id: hotelRef.id,
@@ -60,11 +60,11 @@ export const createHotel = async (hotelDto: HotelDto): Promise<HotelDoc> => {
 export const getByIdHotel = async (userId: string, hotelId: string): Promise<HotelDto> => {
   const hotelRef = db.collection('users').doc(userId).collection('hotels').doc(hotelId);
   const userRef = db.collection('users');
-  if(!(await hotelRef.get()).exists) {
+  if(!(await hotelRef.get())?.exists) {
     throw new Error("The hotel doesn't exist");
   }
   const hotelDocument = (await hotelRef.get()).data() as HotelDoc;
-  const userDocument = (await userRef.doc(hotelDocument.parentId as string).get()).data() as UserDoc
+  const userDocument = (await userRef.doc(hotelDocument.parentId as string).get())?.data() as UserDoc
 
   const response: HotelDto = {
     id: hotelRef.id,
@@ -90,9 +90,8 @@ export const updateHotel = async (hotelUpdate: HotelDto): Promise<HotelDto> => {
     cost: hotelUpdate.cost
   }
   await hotelRef.update({...hotelDoc});
-  const hotelDocumentUpdated = (await hotelRef.get()).data() as HotelDoc;
-  console.log(hotelDocumentUpdated)
-  const userDocument = (await userRef.doc(hotelDocumentUpdated.parentId as string).get()).data() as UserDoc
+  const hotelDocumentUpdated = (await hotelRef.get())?.data() as HotelDoc;
+  const userDocument = (await userRef.doc(hotelDocumentUpdated?.parentId as string).get())?.data() as UserDoc
 
   const response: HotelDto = {
     id: hotelRef.id,
@@ -114,7 +113,6 @@ export const deleteHotel = async (userId: string, hotelId: string): Promise<bool
       return false;
     }
   } catch (error) {
-    console.log("Error to delete hotel")
   }
   
 }
@@ -130,7 +128,6 @@ export const deleteManyHotels = async (ids: string[]): Promise<boolean> => {
     await batch.commit(); // Ejecuta la eliminación en batch
     return true;
   } catch (error) {
-    console.error("Error to delete hotels:", error);
     throw error;
   }
 }
