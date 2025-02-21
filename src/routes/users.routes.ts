@@ -10,7 +10,7 @@ const prefix = '/api/v1/users';
 
 UserRoutes.get(`${prefix}/getall`, verifyToken, checkRole(["ADMIN"]), GetAllUsers);
 UserRoutes.get(`${prefix}/getByRole/:role`, verifyToken, checkRole(["ADMIN"]), GetByRole);
-UserRoutes.post(`${prefix}/create`, verifyToken, checkRole(["ADMIN"]), CreateUser);
+UserRoutes.post(`${prefix}/create`, verifyToken, CreateUser);
 UserRoutes.get(`${prefix}/get/:id`, verifyToken, checkRole(["ADMIN"]), GetById);
 UserRoutes.put(`${prefix}/update`, verifyToken, checkRole(["ADMIN"]), UpdateUser);
 UserRoutes.delete(`${prefix}/delete/:id`, verifyToken, checkRole(["ADMIN"]), DeleteUser);
