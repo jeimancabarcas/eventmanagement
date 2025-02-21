@@ -77,7 +77,7 @@ export const createEvent = async (eventDto: EventDto): Promise<EventDto> => {
 
 export const getByIdEvent = async (id: string): Promise<EventDoc | undefined> => {
   const eventRef = await db.collection('events').doc(id);
-  const eventDocCreated = (await eventRef.get()).data() as EventDto;
+  const eventDocCreated = (await eventRef.get())?.data() as EventDto;
   eventDocCreated.staff = [];
   eventDocCreated.staff = await getStaffsInformation(eventRef.id)
   return {
@@ -89,6 +89,7 @@ export const getByIdEvent = async (id: string): Promise<EventDoc | undefined> =>
 const getStaffsInformation = async (eventDocId: string): Promise<UserDto[]> => {
   const staffs:UserDto[] = []
     // 🔹 Obtener el staff del evento
+    console.log(eventDocId)
     const staffSnapshot = await db.collection("events").doc(eventDocId).collection("staff").get();
 
     for (const staffDoc of staffSnapshot.docs) {
@@ -140,9 +141,9 @@ export const updateEvent = async (eventUpdate: EventDto): Promise<EventDto | und
   const staffSnapshot = await eventRef.collection("staff").get();
   const batch = db.batch();
 
-  staffSnapshot.forEach((doc) => {
+  for (const doc of staffSnapshot.docs) {
     batch.delete(doc.ref);
-  });
+  };
 
   await batch.commit(); // 🔥 Ejecuta la eliminación en batch
 
