@@ -43,4 +43,6 @@ lerna-debug.log*
 
 # Archivos de pruebas HTTP (Rest Client de VSCode)
 *.http
-
+# Test
+test/
+*.json

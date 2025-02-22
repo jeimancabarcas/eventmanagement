@@ -1,4 +1,4 @@
-import { Auth, db } from "../config/firebase";
+import { auth, db } from "../config/firebase";
 import { DtoToken } from "../model/doc/token";
 import CryptoJs from "crypto-js";
 import * as jwt from 'jsonwebtoken';
@@ -26,12 +26,12 @@ export const getAllUsers = async (): Promise<UserDto[]> => {
 export const createUser = async (user: UserDto): Promise<UserDto> => {
   user.role = user.role?.toUpperCase();
   try {
-    const userRecord = await Auth.createUser({
+    const userRecord = await auth.createUser({
       email: user.email,
       password: user.password,
       displayName: user.name,
     });
-    await Auth.setCustomUserClaims(userRecord.uid, { role: user.role });
+    await auth.setCustomUserClaims(userRecord.uid, { role: user.role });
     const userRef = db.collection("users").doc(userRecord.uid);
     const userData: UserDto = {
       name: user.name,
